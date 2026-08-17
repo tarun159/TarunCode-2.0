@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TarunCode 2.0 - Premium futuristic lab-program platform for PC Lab and IoT Lab programs" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>TarunCode 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="min-h-screen bg-surface-950 text-surface-50 antialiased">
+    <div id="root"></div>
+    <script>
+      // Apply the saved theme before React paints to avoid a flash of the wrong theme.
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var isDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var root = document.documentElement;
+          root.classList.toggle('dark', isDark);
+          root.classList.toggle('light', !isDark);
+          document.querySelector('meta[name="theme-color"]')
+            .setAttribute('content', isDark ? '#0f172a' : '#f8fafc');
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

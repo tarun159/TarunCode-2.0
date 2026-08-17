@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+client/node_modules
+
+# Build output
+client/dist
+dist
+
+# Env
+.env
+.env.local
+.env.*.local
+client/.env
+client/.env.local
+client/.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+.vercel
+
+.claude/
