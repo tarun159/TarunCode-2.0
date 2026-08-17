@@ -24,16 +24,16 @@ export function ProgramDetail() {
   const backTo = `/${getLabRoute(lab)}`;
 
   return (
-    <div className="pt-8">
+    <div className="pt-8 min-w-0">
       <BackButton to={backTo} label={`Back to ${lab === 'iot' ? 'IoT' : 'PC'} Lab`} />
-      <div className="mt-4 mb-6">
+      <div className="mt-4 mb-6 min-w-0">
         <div className="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-400 light:text-slate-500 mb-2">
-          <Info className="w-4 h-4" />
-          <span>{program.language.toUpperCase()}</span>
+          <Info className="w-4 h-4 shrink-0" />
+          <span className="min-w-0">{program.language.toUpperCase()}</span>
           <span>•</span>
           <span>{lab.toUpperCase()} LAB #{String(program.number).padStart(2, '0')}</span>
         </div>
-        <h1 className="text-4xl font-bold text-white dark:text-white light:text-slate-900 mb-3">{program.title}</h1>
+        <h1 className="text-4xl font-bold text-white dark:text-white light:text-slate-900 mb-3 break-words">{program.title}</h1>
         <p className="text-slate-400 dark:text-slate-400 light:text-slate-500 text-lg">{program.description}</p>
       </div>
 
@@ -49,10 +49,10 @@ export function ProgramDetail() {
               {program.commands.map((cmd) => (
                 <div
                   key={cmd}
-                  className="flex items-center gap-3 rounded-lg bg-surface-950 dark:bg-surface-950 light:bg-slate-900 px-4 py-2.5 font-mono text-sm text-surface-100 dark:text-surface-100 light:text-slate-100"
+                  className="flex items-start gap-3 rounded-lg bg-surface-950 dark:bg-surface-950 light:bg-slate-900 px-4 py-2.5 font-mono text-sm text-surface-100 dark:text-surface-100 light:text-slate-100 min-w-0"
                 >
-                  <span className="select-none text-primary-400 dark:text-primary-400 light:text-primary-300">$</span>
-                  <code className="text-surface-100 dark:text-surface-100 light:text-slate-100">{cmd}</code>
+                  <span className="select-none text-primary-400 dark:text-primary-400 light:text-primary-300 shrink-0">$</span>
+                  <code className="text-surface-100 dark:text-surface-100 light:text-slate-100 break-all min-w-0">{cmd}</code>
                 </div>
               ))}
             </div>
@@ -60,7 +60,7 @@ export function ProgramDetail() {
         </div>
 
         {/* PROGRAM CODE */}
-        <div>
+        <div className="min-w-0">
           <CodeViewer
             code={program.code || '// Code will be added here.\n// Paste the real program into client/src/data/programs.ts'}
             language={shikiLang}

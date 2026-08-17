@@ -238,6 +238,7 @@
 /* Code viewer styles — polished Shiki-powered editor */
 .code-viewer {
   @apply relative rounded-xl overflow-hidden border;
+  min-width: 0;
 }
 .light .code-viewer {
   border-color: #e2e8f0;
@@ -260,7 +261,6 @@
 .code-viewer .shiki code {
   display: block;
   width: fit-content;
-  min-width: 100%;
 }
 
 /* Scroll container background per theme (Shiki bg is made transparent above) */
