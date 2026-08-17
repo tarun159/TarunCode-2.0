@@ -6,36 +6,68 @@ import { cn } from '@/utils/cn';
 interface CodeViewerProps {
   code: string;
   language: string;
-  theme?: string;
   showLineNumbers?: boolean;
   maxHeight?: string;
 }
 
+// Cache one highlighter (both themes + the bundled languages we use) across
+// all mounts. Shiki 1.x only bundles a fixed set of languages, so we map
+// `arduino` onto `cpp` (Arduino is C++) and never request a non-bundled lang.
+let cachedHighlighter: Promise<Highlighter> | null = null;
+function getSharedHighlighter(): Promise<Highlighter> {
+  if (!cachedHighlighter) {
+    cachedHighlighter = getHighlighter({
+      themes: ['github-dark', 'github-light'],
+      langs: ['c', 'cpp'],
+    }).catch((err) => {
+      // Never let a broken promise stay cached — reset so a later mount retries.
+      cachedHighlighter = null;
+      throw err;
+    });
+  }
+  return cachedHighlighter;
+}
+
+const LANG_MAP: Record<string, string> = {
+  c: 'c',
+  cpp: 'cpp',
+  'c++': 'cpp',
+  arduino: 'cpp',
+  h: 'c',
+  hpp: 'cpp',
+};
+
 export function CodeViewer({
   code,
   language,
-  theme = 'github-dark',
   showLineNumbers = true,
   maxHeight = '500px',
 }: CodeViewerProps) {
-  const [highlightedCode, setHighlightedCode] = useState('');
+  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [highlighter, setHighlighter] = useState<Highlighter | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-    getHighlighter({ themes: [theme], langs: [language] }).then((hl) => {
-      if (mounted) setHighlighter(hl);
-    });
+    let active = true;
+    const lang = LANG_MAP[language] ?? 'c';
+    getSharedHighlighter()
+      .then((hl) => {
+        if (!active) return;
+        setHighlightedHtml(
+          hl.codeToHtml(code, {
+            lang,
+            themes: { light: 'github-light', dark: 'github-dark' },
+          }),
+        );
+      })
+      .catch(() => {
+        // On any Shiki failure, fall back to a plain read-only display rather
+        // than staying stuck on "Loading…".
+        if (active) setHighlightedHtml(null);
+      });
     return () => {
-      mounted = false;
+      active = false;
     };
-  }, [language, theme]);
-
-  useEffect(() => {
-    if (!highlighter) return;
-    setHighlightedCode(highlighter.codeToHtml(code, { lang: language, theme }));
-  }, [highlighter, code, language, theme]);
+  }, [code, language]);
 
   const handleCopy = async () => {
     try {
@@ -69,7 +101,7 @@ export function CodeViewer({
             'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200',
             copied
               ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-              : 'bg-surface-800/50 text-surface-300 hover:bg-surface-800 hover:text-surface-100 border border-surface-700 dark:bg-surface-800/50 dark:text-surface-300 dark:hover:bg-surface-800 dark:hover:text-surface-100 dark:border-surface-700 light:bg-slate-200 light:text-slate-700 light:hover:bg-slate-300 light:border-slate-300'
+              : 'bg-surface-800/50 text-surface-300 hover:bg-surface-800 hover:text-surface-100 border border-surface-700 dark:bg-surface-800/50 dark:text-surface-300 dark:hover:bg-surface-800 dark:hover:text-surface-100 dark:border-surface-700 light:bg-slate-200 light:text-slate-700 light:hover:bg-slate-300 light:border-slate-300',
           )}
           aria-label={copied ? 'Copied to clipboard' : 'Copy code to clipboard'}
         >
@@ -86,15 +118,15 @@ export function CodeViewer({
           )}
         </button>
       </div>
-      <pre className="m-0 p-6 overflow-x-auto" style={{ maxHeight, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
-        <code className="text-sm leading-relaxed text-surface-100 dark:text-surface-100 light:text-slate-800">
-          {highlightedCode ? (
-            <div dangerouslySetInnerHTML={{ __html: highlightedCode }} />
-          ) : (
-            <span className="text-surface-500 dark:text-surface-500 light:text-slate-500">Loading...</span>
-          )}
-        </code>
-      </pre>
+      <div className="code-scroll" style={{ maxHeight }}>
+        {highlightedHtml ? (
+          <div dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
+        ) : (
+          <pre className="m-0 p-6 overflow-x-auto font-mono text-sm leading-relaxed text-surface-200 dark:text-surface-200 light:text-slate-800">
+            {code}
+          </pre>
+        )}
+      </div>
     </div>
   );
 }

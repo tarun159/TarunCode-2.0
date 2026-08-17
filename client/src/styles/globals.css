@@ -235,34 +235,54 @@
   }
 }
 
-/* Code viewer styles */
+/* Code viewer styles — polished Shiki-powered editor */
 .code-viewer {
-  @apply relative rounded-xl overflow-hidden bg-surface-950 border border-surface-800;
+  @apply relative rounded-xl overflow-hidden border;
+}
+.light .code-viewer {
+  border-color: #e2e8f0;
+}
+.dark .code-viewer {
+  border-color: #1e293b;
 }
 
-.code-viewer pre {
+/* Shiki dual-theme output: each <pre> and token <span> carries an inline
+   literal `color` (the GitHub-LIGHT hex) plus a `--shiki-dark` variable (the
+   GitHub-DARK hex). So in LIGHT mode we leave the inline light colors alone
+   untouched, and only in DARK mode force the per-token --shiki-dark value
+   (with !important, because Shiki's inline styles would otherwise win). */
+.code-viewer .shiki {
   @apply m-0 p-6 overflow-x-auto text-sm leading-relaxed;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+  background-color: transparent !important;
+  tab-size: 2;
+}
+.code-viewer .shiki code {
+  display: block;
+  width: fit-content;
+  min-width: 100%;
 }
 
-.code-viewer code {
-  @apply text-surface-100;
+/* Scroll container background per theme (Shiki bg is made transparent above) */
+.code-scroll {
+  @apply overflow-auto;
+}
+.light .code-scroll {
+  background-color: #f6f8fa;
+}
+.dark .code-scroll {
+  background-color: #0d1117;
 }
 
-.code-viewer .token.comment { @apply text-surface-500 italic; }
-.code-viewer .token.punctuation { @apply text-surface-300; }
-.code-viewer .token.keyword { @apply text-primary-400 font-medium; }
-.code-viewer .token.function { @apply text-accent-400; }
-.code-viewer .token.string { @apply text-green-400; }
-.code-viewer .token.number { @apply text-yellow-400; }
-.code-viewer .token.operator { @apply text-surface-300; }
-.code-viewer .token.boolean { @apply text-orange-400; }
-.code-viewer .token.class-name { @apply text-primary-300 font-medium; }
-.code-viewer .token.constant { @apply text-purple-400; }
-.code-viewer .token.property { @apply text-cyan-400; }
-.code-viewer .token.tag { @apply text-red-400; }
-.code-viewer .token.attr-name { @apply text-yellow-300; }
-.code-viewer .token.attr-value { @apply text-green-300; }
+/* Dark mode: override the pre + every token span with its --shiki-dark value.
+   Light mode is intentionally left untouched so Shiki's inline light colors show. */
+.dark .code-viewer .shiki,
+.dark .code-viewer .shiki span {
+  color: var(--shiki-dark) !important;
+}
+.code-viewer .shiki .line {
+  min-height: 1.5rem;
+}
 
 /* Toast animations */
 .toast-enter {
