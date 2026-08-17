@@ -8,6 +8,10 @@ import { ProgramDetail } from '@/components/ProgramDetail';
 import { IoTProgramList, IoTProgramDetail } from '@/components/iot';
 import { BasicProgramsCollection } from '@/components/BasicProgramsCollection';
 import { Landing } from '@/pages/Landing';
+import { About } from '@/pages/About';
+import { PrivacyPolicy } from '@/pages/PrivacyPolicy';
+import { Terms } from '@/pages/Terms';
+import { Documentation } from '@/pages/Documentation';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
@@ -58,6 +62,10 @@ function App() {
   return (
     <Routes>
       <Route element={<AppShell />}>
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/documentation" element={<Documentation />} />
         <Route element={<GuestOnly />}>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
