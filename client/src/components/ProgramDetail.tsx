@@ -1,5 +1,5 @@
 import { useParams, Navigate } from 'react-router-dom';
-import { BookOpen, Terminal, Info } from 'lucide-react';
+import { Terminal, Info } from 'lucide-react';
 import { getProgram } from '@/data/programs';
 import { BackButton } from './BackButton';
 import { CodeViewer } from './CodeViewer';
@@ -13,6 +13,7 @@ export function ProgramDetail() {
   }
 
   const parsed = Number(number);
+
   const program = Number.isFinite(parsed) ? getProgram(lab, parsed) : undefined;
 
   if (!program) {
@@ -36,32 +37,47 @@ export function ProgramDetail() {
         <p className="text-slate-400 dark:text-slate-400 light:text-slate-500 text-lg">{program.description}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6">
+        {/* COMMAND */}
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/10 light:border-slate-200/50 overflow-hidden">
           <div className="flex items-center px-4 py-3 border-b border-white/10 dark:border-white/10 light:border-slate-200/50 bg-white/5 dark:bg-white/5 light:bg-slate-100/50">
-            <Terminal className="w-5 h-5 mr-2 text-purple-400 dark:text-purple-400 light:text-purple-600" />
-            <h2 className="text-lg font-semibold text-white dark:text-white light:text-slate-900">Input / Output</h2>
+            <Terminal className="w-5 h-5 mr-2 text-primary-400 dark:text-primary-400 light:text-primary-600" />
+            <h2 className="text-lg font-semibold text-white dark:text-white light:text-slate-900">Command</h2>
           </div>
           <div className="p-4">
-            <pre className="text-sm text-slate-300 dark:text-slate-300 light:text-slate-600 whitespace-pre-wrap">{program.inputOutput}</pre>
+            <div className="flex flex-col gap-2">
+              {program.commands.map((cmd) => (
+                <div
+                  key={cmd}
+                  className="flex items-center gap-3 rounded-lg bg-surface-950 dark:bg-surface-950 light:bg-slate-900 px-4 py-2.5 font-mono text-sm text-surface-100 dark:text-surface-100 light:text-slate-100"
+                >
+                  <span className="select-none text-primary-400 dark:text-primary-400 light:text-primary-300">$</span>
+                  <code className="text-surface-100 dark:text-surface-100 light:text-slate-100">{cmd}</code>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/10 light:border-slate-200/50 overflow-hidden">
-          <div className="flex items-center px-4 py-3 border-b border-white/10 dark:border-white/10 light:border-slate-200/50 bg-white/5 dark:bg-white/5 light:bg-slate-100/50">
-            <BookOpen className="w-5 h-5 mr-2 text-cyan-400 dark:text-cyan-400 light:text-cyan-600" />
-            <h2 className="text-lg font-semibold text-white dark:text-white light:text-slate-900">Algorithm</h2>
-          </div>
-          <div className="p-4">
-            <pre className="text-sm text-slate-300 dark:text-slate-300 light:text-slate-600 whitespace-pre-wrap leading-relaxed">{program.algorithm}</pre>
-          </div>
-        </div>
-
-        <div className="lg:col-span-2">
+        {/* PROGRAM CODE */}
+        <div>
           <CodeViewer
             code={program.code || '// Code will be added here.\n// Paste the real program into client/src/data/programs.ts'}
             language={shikiLang}
           />
+        </div>
+
+        {/* OUTPUT */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/10 light:border-slate-200/50 overflow-hidden">
+          <div className="flex items-center px-4 py-3 border-b border-white/10 dark:border-white/10 light:border-slate-200/50 bg-white/5 dark:bg-white/5 light:bg-slate-100/50">
+            <Terminal className="w-5 h-5 mr-2 text-cyan-400 dark:text-cyan-400 light:text-cyan-600" />
+            <h2 className="text-lg font-semibold text-white dark:text-white light:text-slate-900">Output</h2>
+          </div>
+          <div className="p-4">
+            <pre className="text-sm text-slate-300 dark:text-slate-300 light:text-slate-600 whitespace-pre-wrap bg-surface-950 dark:bg-surface-950 light:bg-slate-900 rounded-lg p-4 overflow-x-auto">
+              {program.output}
+            </pre>
+          </div>
         </div>
       </div>
     </div>

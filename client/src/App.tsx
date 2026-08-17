@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ProgramList } from '@/components/ProgramList';
 import { ProgramDetail } from '@/components/ProgramDetail';
 import { IoTProgramList, IoTProgramDetail } from '@/components/iot';
+import { BasicProgramsCollection } from '@/components/BasicProgramsCollection';
 import { Landing } from '@/pages/Landing';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
@@ -67,6 +68,10 @@ function App() {
           <Route
             path="/pc-lab"
             element={<ProgramList programs={getProgramsByLab('pc')} isLoading={false} error={null} lab="pc" />}
+          />
+          <Route
+            path="/pc-lab/basic-programs"
+            element={<BasicProgramsCollection />}
           />
           <Route
             path="/iot-lab"

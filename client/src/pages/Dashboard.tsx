@@ -10,14 +10,14 @@ export function Dashboard() {
     {
       to: '/pc-lab',
       title: 'PC Lab',
-      description: '10 C program slots. View and copy core programming labs.',
+      description: '10 core C lab programs with ready-to-use code for practical learning.',
       icon: Cpu,
       accent: 'from-primary-500 to-primary-700',
     },
     {
       to: '/iot-lab',
       title: 'IoT Lab',
-      description: '10 embedded/IoT slots. GPIO, sensors, WiFi, MQTT, and more.',
+      description: '10 practical IoT programs covering Arduino, GPIO, sensors, and connectivity.',
       icon: Wifi,
       accent: 'from-accent-500 to-accent-700',
     },

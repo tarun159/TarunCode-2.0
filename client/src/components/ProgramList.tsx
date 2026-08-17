@@ -1,5 +1,7 @@
 import { Cpu, Wifi, Activity, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Code2, ChevronRight } from 'lucide-react';
 import { Program } from '@/data/programs';
 import { ProgramCard } from './ProgramCard';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -81,6 +83,56 @@ export function ProgramList({ programs, isLoading, error, lab }: ProgramListProp
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Standalone "Basic Programs" reference card — NOT a numbered experiment */}
+        {!isIoT && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="glass-card border-gradient group relative overflow-hidden transform-gpu transition-all duration-300"
+            onClick={() => navigate('/pc-lab/basic-programs')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/pc-lab/basic-programs'); }}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-accent-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-primary-500 to-primary-600">
+                    <Code2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-surface-400 dark:text-surface-400 light:text-slate-500 uppercase tracking-wider">
+                      Reference
+                    </p>
+                    <p className="text-sm font-mono text-primary-400 dark:text-primary-400 light:text-primary-600">
+                      Beginner C
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-surface-500 dark:text-surface-500 light:text-slate-400 group-hover:text-primary-400 dark:group-hover:text-primary-400 light:group-hover:text-primary-600 transition-colors opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0" />
+              </div>
+              <h3 className="text-lg font-semibold text-surface-100 dark:text-surface-100 light:text-slate-900 mb-2 line-clamp-1">
+                Basic Programs
+              </h3>
+              <p className="text-sm text-surface-400 dark:text-surface-400 light:text-slate-500 line-clamp-2 mb-4">
+                A starter collection of beginner C programs with runnable code and sample output.
+              </p>
+              <div className="flex items-center gap-3 pt-4 border-t border-white/5 dark:border-white/5 light:border-slate-200/50">
+                <span className="px-2 py-1 text-xs font-mono rounded-lg bg-surface-800/50 dark:bg-surface-800/50 light:bg-slate-200/50 text-surface-300 dark:text-surface-300 light:text-slate-700 border border-surface-700 dark:border-surface-700 light:border-slate-300">
+                  C
+                </span>
+                <span className="text-xs text-surface-500 dark:text-surface-500 light:text-slate-400 flex-1 text-right">
+                  Click to view
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {programs.map((program, index) => (
           <ProgramCard
             key={`${program.lab}-${program.number}`}

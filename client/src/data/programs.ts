@@ -5,214 +5,261 @@ export interface Program {
   description: string;
   language: string;
   code: string;
-  algorithm: string;
-  inputOutput: string;
+  commands: string[];
+  output: string;
 }
 
 export const programs: Program[] = [
-  // PC Lab Programs (1-10)
+  // PC Lab Programs — #01 and #02 are the VTU OpenMP experiments; #03-#11 are the core C exercises.
   {
     lab: 'pc',
     number: 1,
-    title: 'Hello World & Basic I/O',
-    description: 'Learn to write your first C program with basic input/output operations.',
+    title: 'OpenMP Program: Sequential vs Parallel Mergesort',
+    description: 'Write an OpenMP program to sort an array of n elements using both sequential and parallel mergesort (using sections). Record the difference in execution time.',
     language: 'c',
-    code: '',
-    algorithm: '1. Include standard I/O header\n2. Define main function\n3. Print "Hello, World!" using printf\n4. Return 0 to indicate successful execution',
-    inputOutput: 'Input: None\nOutput: Hello, World!',
+    code: `#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+void merge(int arr[], int l, int m, int r) {
+    int i = l, j = m + 1, k = 0;
+    int temp[r - l + 1];
+
+    while (i <= m && j <= r) {
+        if (arr[i] <= arr[j])
+            temp[k++] = arr[i++];
+        else
+            temp[k++] = arr[j++];
+    }
+    while (i <= m) temp[k++] = arr[i++];
+    while (j <= r) temp[k++] = arr[j++];
+
+    for (i = l, k = 0; i <= r; i++, k++)
+        arr[i] = temp[k];
+}
+
+void sequentialMergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = (l + r) / 2;
+        sequentialMergeSort(arr, l, m);
+        sequentialMergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}
+
+void parallelMergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = (l + r) / 2;
+
+        #pragma omp parallel sections
+        {
+            #pragma omp section
+            parallelMergeSort(arr, l, m);
+
+            #pragma omp section
+            parallelMergeSort(arr, m + 1, r);
+        }
+
+        merge(arr, l, m, r);
+    }
+}
+
+int main() {
+    int n = 100000;
+    int arr1[n], arr2[n];
+
+    for (int i = 0; i < n; i++) {
+        arr1[i] = rand() % 1000;
+        arr2[i] = arr1[i];
+    }
+
+    double start, end;
+
+    start = omp_get_wtime();
+    sequentialMergeSort(arr1, 0, n - 1);
+    end = omp_get_wtime();
+    printf("Sequential Merge Sort Time: %f seconds\\n", end - start);
+
+    start = omp_get_wtime();
+    parallelMergeSort(arr2, 0, n - 1);
+    end = omp_get_wtime();
+    printf("Parallel Merge Sort Time: %f seconds\\n", end - start);
+
+    return 0;
+}`,
+    commands: [
+      'Create: gedit prg1.c',
+      'Compile: gcc -fopenmp prg1.c -o prg1',
+      'Run: export OMP_NUM_THREADS=4 && ./prg1',
+    ],
+    output: 'Sequential Merge Sort Time: 0.012787 seconds\nParallel Merge Sort Time: 0.035695 seconds',
   },
   {
     lab: 'pc',
     number: 2,
+    title: 'OpenMP Program: Static Schedule (chunk = 2)',
+    description: 'Write an OpenMP program that divides the iterations into chunks containing 2 iterations respectively (OMP_SCHEDULE=static,2). Its input should be the number of iterations, and its output should show which iterations of a parallelized for loop are executed by which thread.',
+    language: 'c',
+    code: `#include <stdio.h>
+#include <omp.h>
+
+int main() {
+    int i, tid, n = 12;
+    omp_set_num_threads(4);
+
+    #pragma omp parallel for schedule(static, 2)
+    for (i = 0; i < n; i++) {
+        tid = omp_get_thread_num();
+        printf("Iteration %d executed by thread %d\\n", i, tid);
+    }
+
+    return 0;
+}`,
+    commands: [
+      'Create: gedit prg2.c',
+      'Compile: gcc -fopenmp prg2.c -o prg2',
+      'Run: export OMP_NUM_THREADS=4 && ./prg2',
+    ],
+    output: `Iteration 0 executed by thread 0
+Iteration 1 executed by thread 0
+Iteration 2 executed by thread 1
+Iteration 3 executed by thread 1
+Iteration 4 executed by thread 2
+Iteration 5 executed by thread 2
+Iteration 6 executed by thread 3
+Iteration 7 executed by thread 3
+Iteration 8 executed by thread 0
+Iteration 9 executed by thread 0
+Iteration 10 executed by thread 1
+Iteration 11 executed by thread 1`,
+  },
+  {
+    lab: 'pc',
+    number: 3,
     title: 'Variables and Data Types',
     description: 'Explore different data types in C and how to declare and use variables.',
     language: 'c',
-    code: '',
-    algorithm: '1. Declare variables of different types (int, float, char, double)\n2. Initialize with values\n3. Print each variable using appropriate format specifiers\n4. Demonstrate type sizes using sizeof operator',
-    inputOutput: 'Input: None\nOutput: Variable values and their sizes',
+    code: ``,
+    commands: [
+      'Create: gedit prg3.c',
+      'Compile: gcc prg3.c -o prg3',
+      'Run: ./prg3',
+    ],
+    output: 'Variable values and their sizes',
   },
   {
     lab: 'pc',
-    number: 3,
+    number: 4,
     title: 'Control Structures - If/Else',
     description: 'Implement conditional logic using if, else if, and else statements.',
     language: 'c',
-    code: '',
-    algorithm: '1. Read an integer from user\n2. Check if number is positive, negative, or zero\n3. Check if number is even or odd\n4. Print appropriate messages for each condition',
-    inputOutput: 'Input: 7\nOutput: Positive\nOdd',
+    code: ``,
+    commands: [
+      'Create: gedit prg4.c',
+      'Compile: gcc prg4.c -o prg4',
+      'Run: ./prg4',
+    ],
+    output: 'Positive\nOdd',
   },
   {
     lab: 'pc',
-    number: 4,
+    number: 5,
     title: 'Loops - For, While, Do-While',
     description: 'Master different loop constructs to perform repetitive tasks.',
     language: 'c',
-    code: '',
-    algorithm: '1. Use for loop to print numbers 1 to 10\n2. Use while loop to calculate sum of first n natural numbers\n3. Use do-while to print multiplication table\n4. Demonstrate break and continue statements',
-    inputOutput: 'Input: 5\nOutput: 1 2 3 4 5\nSum: 15\nTable of 5',
+    code: ``,
+    commands: [
+      'Create: gedit prg5.c',
+      'Compile: gcc prg5.c -o prg5',
+      'Run: ./prg5',
+    ],
+    output: '1 2 3 4 5\nSum: 15\nTable of 5',
   },
   {
     lab: 'pc',
-    number: 5,
+    number: 6,
     title: 'Arrays - 1D and 2D',
     description: 'Work with one-dimensional and two-dimensional arrays.',
     language: 'c',
-    code: '',
-    algorithm: '1. Declare and initialize 1D array\n2. Find maximum, minimum, and average\n3. Declare 2D matrix\n4. Perform matrix addition and print result',
-    inputOutput: 'Input: Array elements\nOutput: Max, Min, Average\nMatrix sum',
+    code: ``,
+    commands: [
+      'Create: gedit prg6.c',
+      'Compile: gcc prg6.c -o prg6',
+      'Run: ./prg6',
+    ],
+    output: 'Max, Min, Average\nMatrix sum',
   },
   {
     lab: 'pc',
-    number: 6,
+    number: 7,
     title: 'Functions - Modular Programming',
     description: 'Create reusable code with functions, parameters, and return values.',
     language: 'c',
-    code: '',
-    algorithm: '1. Create function to calculate factorial\n2. Create function to check prime number\n3. Create function to swap two numbers\n4. Demonstrate call by value and call by reference',
-    inputOutput: 'Input: 5\nOutput: Factorial: 120\nPrime check\nSwapped values',
+    code: ``,
+    commands: [
+      'Create: gedit prg7.c',
+      'Compile: gcc prg7.c -o prg7',
+      'Run: ./prg7',
+    ],
+    output: 'Factorial: 120\nPrime check\nSwapped values',
   },
   {
     lab: 'pc',
-    number: 7,
+    number: 8,
     title: 'Pointers Basics',
     description: 'Understand memory addresses, pointer declaration, and dereferencing.',
     language: 'c',
-    code: '',
-    algorithm: '1. Declare pointer variables\n2. Assign address of variables to pointers\n3. Access values through pointers\n4. Demonstrate pointer arithmetic',
-    inputOutput: 'Input: Integer value\nOutput: Address and value via pointer',
+    code: ``,
+    commands: [
+      'Create: gedit prg8.c',
+      'Compile: gcc prg8.c -o prg8',
+      'Run: ./prg8',
+    ],
+    output: 'Address and value via pointer',
   },
   {
     lab: 'pc',
-    number: 8,
+    number: 9,
     title: 'Strings and String Functions',
     description: 'Manipulate character arrays and use standard string library functions.',
     language: 'c',
-    code: '',
-    algorithm: '1. Read string from user\n2. Calculate length using strlen\n3. Copy string using strcpy\n4. Concatenate strings using strcat\n5. Compare strings using strcmp',
-    inputOutput: 'Input: "Hello" "World"\nOutput: Length: 5\nConcatenated: HelloWorld',
+    code: ``,
+    commands: [
+      'Create: gedit prg9.c',
+      'Compile: gcc prg9.c -o prg9',
+      'Run: ./prg9',
+    ],
+    output: 'Length: 5\nConcatenated: HelloWorld',
   },
   {
     lab: 'pc',
-    number: 9,
+    number: 10,
     title: 'Structures - Custom Data Types',
     description: 'Define and use structures to group related data of different types.',
     language: 'c',
-    code: '',
-    algorithm: '1. Define Student structure with name, roll, marks\n2. Create array of structures\n3. Input data for multiple students\n4. Display student details and find topper',
-    inputOutput: 'Input: Student records\nOutput: All records\nTopper details',
+    code: ``,
+    commands: [
+      'Create: gedit prg10.c',
+      'Compile: gcc prg10.c -o prg10',
+      'Run: ./prg10',
+    ],
+    output: 'All records\nTopper details',
   },
   {
     lab: 'pc',
-    number: 10,
+    number: 11,
     title: 'File Handling - Read/Write',
     description: 'Perform file operations: create, read, write, and append to files.',
     language: 'c',
-    code: '',
-    algorithm: '1. Open file in write mode\n2. Write student data to file\n3. Close and reopen in read mode\n4. Read and display file contents\n5. Demonstrate append mode',
-    inputOutput: 'Input: Student data\nOutput: File contents displayed',
+    code: ``,
+    commands: [
+      'Create: gedit prg11.c',
+      'Compile: gcc prg11.c -o prg11',
+      'Run: ./prg11',
+    ],
+    output: 'File contents displayed',
   },
 
-  // IoT Lab Programs (1-10)
-  {
-    lab: 'iot',
-    number: 1,
-    title: 'Blink Five LEDs Back-Forth',
-    description: 'Control an LED using GPIO pins on a microcontroller.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize GPIO pin as output\n2. Set pin HIGH to turn LED on\n3. Delay for specified time\n4. Set pin LOW to turn LED off\n4. Repeat in infinite loop',
-    inputOutput: 'Input: Delay time (ms)\nOutput: LED blinking',
-  },
-  {
-    lab: 'iot',
-    number: 2,
-    title: 'Button Input - Digital Read',
-    description: 'Read digital input from a push button with debouncing.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize GPIO pin as input with pull-up\n2. Read button state in loop\n3. Implement software debouncing\n4. Toggle LED on button press\n5. Print state to serial monitor',
-    inputOutput: 'Input: Button press\nOutput: LED toggle + Serial output',
-  },
-  {
-    lab: 'iot',
-    number: 3,
-    title: 'Analog Sensor Reading - ADC',
-    description: 'Read analog values from sensors using ADC (Analog to Digital Converter).',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize ADC peripheral\n2. Configure channel for sensor\n3. Read raw ADC value in loop\n4. Convert to voltage/temperature\n5. Display on serial monitor',
-    inputOutput: 'Input: Analog sensor\nOutput: Voltage/Temperature readings',
-  },
-  {
-    lab: 'iot',
-    number: 4,
-    title: 'PWM - LED Brightness Control',
-    description: 'Control LED brightness using Pulse Width Modulation.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize PWM timer\n2. Set frequency and resolution\n3. Vary duty cycle from 0 to 100%\n4. Create fade in/out effect\n5. Control via potentiometer input',
-    inputOutput: 'Input: Potentiometer value\nOutput: LED brightness change',
-  },
-  {
-    lab: 'iot',
-    number: 5,
-    title: 'I2C Communication - LCD Display',
-    description: 'Interface with I2C LCD display to show text and sensor data.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize I2C bus\n2. Scan for LCD address\n3. Initialize LCD controller\n4. Print static text\n5. Update with dynamic sensor data',
-    inputOutput: 'Input: I2C LCD module\nOutput: Text on display',
-  },
-  {
-    lab: 'iot',
-    number: 6,
-    title: 'SPI Communication - SD Card',
-    description: 'Read and write data to SD card using SPI protocol.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize SPI bus\n2. Initialize SD card module\n3. Create/open file on SD card\n4. Write sensor log data\n5. Read back and verify',
-    inputOutput: 'Input: Sensor data\nOutput: Data logged to SD card',
-  },
-  {
-    lab: 'iot',
-    number: 7,
-    title: 'WiFi Connection - HTTP Client',
-    description: 'Connect to WiFi and make HTTP requests to web APIs.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Initialize WiFi module\n2. Connect to access point\n3. Make GET request to API\n4. Parse JSON response\n5. Display data on serial monitor',
-    inputOutput: 'Input: WiFi credentials\nOutput: API data retrieved',
-  },
-  {
-    lab: 'iot',
-    number: 8,
-    title: 'MQTT - Publish/Subscribe',
-    description: 'Implement MQTT protocol for IoT device communication.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Connect to MQTT broker\n2. Subscribe to command topic\n3. Publish sensor data periodically\n4. Handle incoming messages\n5. Control actuators based on commands',
-    inputOutput: 'Input: MQTT broker details\nOutput: Bidirectional communication',
-  },
-  {
-    lab: 'iot',
-    number: 9,
-    title: 'Deep Sleep - Power Management',
-    description: 'Implement deep sleep mode for battery-powered IoT devices.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Configure wake-up sources (timer, GPIO)\n2. Perform sensor reading\n3. Transmit data\n4. Enter deep sleep mode\n5. Wake up and repeat cycle',
-    inputOutput: 'Input: Sleep duration\nOutput: Periodic wake/sleep cycle',
-  },
-  {
-    lab: 'iot',
-    number: 10,
-    title: 'OTA Updates - Firmware Upgrade',
-    description: 'Implement Over-The-Air firmware updates for IoT devices.',
-    language: 'cpp',
-    code: '',
-    algorithm: '1. Check for firmware updates on server\n2. Download new firmware binary\n3. Verify checksum/signature\n4. Write to OTA partition\n5. Reboot into new firmware',
-    inputOutput: 'Input: OTA server URL\nOutput: Firmware updated',
-  },
 ];
 
 export function getProgramsByLab(lab: 'pc' | 'iot'): Program[] {
@@ -229,6 +276,91 @@ export function getAllPrograms(): Program[] {
     return a.number - b.number;
   });
 }
+
+// ---------------------------------------------------------------------------
+// PC Lab Program 01 — "Basic Programs" collection
+// A curated set of beginner C programs shown on the PC Lab #1 detail page.
+// These are presentation-only (no editing/auth), reusing the shared CodeViewer.
+// ---------------------------------------------------------------------------
+export interface BasicProgram {
+  id: string;
+  title: string;
+  code: string;
+  output: string;
+}
+
+export const compileRunGuide = {
+  title: 'How to Compile and Run C Programs',
+  commands: ['nano program.c', 'gcc program.c -o program', './program'],
+  note: 'Create the C file, compile it with GCC, then run the generated executable.',
+};
+
+export const basicPrograms: BasicProgram[] = [
+  {
+    id: 'basic-hello',
+    title: 'Basic Hello World Program',
+    code: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+    output: 'Hello, World!',
+  },
+  {
+    id: 'basic-prime',
+    title: 'Prime Numbers from 1 to n',
+    code: `#include <stdio.h>
+
+int main() {
+    int n, i, j, flag;
+
+    printf("Enter n: ");
+    scanf("%d", &n);
+
+    for(i = 2; i <= n; i++) {
+        flag = 1;
+
+        for(j = 2; j < i; j++) {
+            if(i % j == 0) {
+                flag = 0;
+                break;
+            }
+        }
+
+        if(flag)
+            printf("%d ", i);
+    }
+
+    return 0;
+}`,
+    output: `Enter n: 20
+2 3 5 7 11 13 17 19`,
+  },
+  {
+    id: 'basic-fibonacci',
+    title: 'Fibonacci Series',
+    code: `#include <stdio.h>
+
+int main() {
+    int n, a = 0, b = 1, c, i;
+
+    printf("Enter n: ");
+    scanf("%d", &n);
+
+    for(i = 1; i <= n; i++) {
+        printf("%d ", a);
+        c = a + b;
+        a = b;
+        b = c;
+    }
+
+    return 0;
+}`,
+    output: `Enter n: 7
+0 1 1 2 3 5 8`,
+  },
+];
 
 // ---------------------------------------------------------------------------
 // IoT Lab (new reusable structure)
