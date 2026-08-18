@@ -98,68 +98,170 @@ int main() {
     lab: 'pc',
     number: 2,
     title: 'OpenMP Program: Static Schedule (chunk = 2)',
-    description: 'Write an OpenMP program that divides the iterations into chunks containing 2 iterations respectively (OMP_SCHEDULE=static,2). Its input should be the number of iterations, and its output should show which iterations of a parallelized for loop are executed by which thread.',
+    description: `Write an OpenMP program that divides the Iterations into chunks containing 2 iterations, respectively (OMP_SCHEDULE=static,2). Its input should be the number of iterations, and its output should be which iterations of a parallelized for loop are executed by which thread. For example, if there are two threads and four iterations, the output might be the following:
+a. Thread 0 : Iterations 0 −− 1
+b. Thread 1 : Iterations 2 −− 3
+`,
     language: 'c',
     code: `#include <stdio.h>
 #include <omp.h>
 
 int main() {
-    int i, tid, n = 12;
-    omp_set_num_threads(4);
+    int n;
+    printf("Enter number of iterations: ");
+    scanf("%d", &n);
 
-    #pragma omp parallel for schedule(static, 2)
+    int thread_start[100], thread_end[100];
+    int i;
+
+    for (i = 0; i < 100; i++) {
+        thread_start[i] = -1;
+        thread_end[i] = -1;
+    }
+
+    #pragma omp parallel for schedule(static,2)
     for (i = 0; i < n; i++) {
-        tid = omp_get_thread_num();
-        printf("Iteration %d executed by thread %d\\n", i, tid);
+        int tid = omp_get_thread_num();
+
+        if (thread_start[tid] == -1)
+            thread_start[tid] = i;
+        thread_end[tid] = i;
+    }
+
+    for (i = 0; i < 100; i++) {
+        if (thread_start[i] != -1) {
+            printf("Thread %d : Iterations %d -- %d\\n", i, thread_start[i], thread_end[i]);
+
+        }
     }
 
     return 0;
-}`,
+}
+`,
     commands: [
       'Create: gedit prg2.c',
       'Compile: gcc -fopenmp prg2.c -o prg2',
       'Run: export OMP_NUM_THREADS=4 && ./prg2',
     ],
-    output: `Iteration 0 executed by thread 0
-Iteration 1 executed by thread 0
-Iteration 2 executed by thread 1
-Iteration 3 executed by thread 1
-Iteration 4 executed by thread 2
-Iteration 5 executed by thread 2
-Iteration 6 executed by thread 3
-Iteration 7 executed by thread 3
-Iteration 8 executed by thread 0
-Iteration 9 executed by thread 0
-Iteration 10 executed by thread 1
-Iteration 11 executed by thread 1`,
+    output: `Enter number of iterations: 6
+Thread 0 : Iterations 0 -- 1
+Thread 1 : Iterations 2 -- 3
+Thread 2 : Iterations 4 -- 5
+`,
   },
   {
     lab: 'pc',
     number: 3,
-    title: 'Variables and Data Types',
-    description: 'Explore different data types in C and how to declare and use variables.',
+    title: 'Fibonacci with OpenMP Tasks',
+    description: 'Write a OpenMP program to calculate n Fibonacci numbers using tasks.',
     language: 'c',
-    code: ``,
+    code: `#include <stdio.h>
+#include <omp.h>
+
+int fib(int n) {
+    int x, y;
+
+    if (n < 2)
+        return n;
+
+    #pragma omp task shared(x)
+    x = fib(n - 1);
+
+    #pragma omp task shared(y)
+    y = fib(n - 2);
+
+    #pragma omp taskwait
+    return x + y;
+}
+
+int main() {
+    int n;
+
+    printf("Enter number of Fibonacci terms: ");
+    scanf("%d", &n);
+
+    printf("Fibonacci Series:\\n");
+
+    for (int i = 0; i < n; i++) {
+        int result;
+
+        #pragma omp parallel
+        {
+            #pragma omp single
+            {
+                result = fib(i);
+            }
+        }
+
+        printf("%d ", result);
+    }
+
+    printf("\\n");
+    return 0;
+}`,
     commands: [
       'Create: gedit prg3.c',
-      'Compile: gcc prg3.c -o prg3',
-      'Run: ./prg3',
+      'Compile: gcc -fopenmp prg3.c -o prg3',
+      'Run: export OMP_NUM_THREADS=4 && ./prg3',
     ],
-    output: 'Variable values and their sizes',
+    output: 'Enter number of Fibonacci terms: 10 \nFibonacci Series:\n0 1 1 2 3 5 8 13 21 34 ',
   },
   {
     lab: 'pc',
     number: 4,
-    title: 'Control Structures - If/Else',
-    description: 'Implement conditional logic using if, else if, and else statements.',
+    title: 'OpenMP Prime Numbers',
+    description: 'Write a OpenMP program to find the prime numbers from 1 to n employing parallel for directive. Record both serial and parallel execution times.',
     language: 'c',
-    code: ``,
+    code: `#include <stdio.h>
+#include <math.h>
+#include <omp.h>
+
+int is_prime(int num) {
+    if (num < 2) return 0;
+    for (int i = 2; i <= sqrt(num); i++) {
+        if (num % i == 0)
+            return 0;
+    }
+    return 1;
+}
+
+int main() {
+    int n;
+    printf("Enter the value of n: ");
+    scanf("%d", &n);
+
+    printf("\\nPrime numbers from 1 to %d:\\n", n);
+    for (int i = 1; i <= n; i++) {
+        if (is_prime(i))
+            printf("%d ", i);
+    }
+    printf("\\n");
+
+    double start_time, end_time;
+
+    start_time = omp_get_wtime();
+    for (int i = 1; i <= n; i++) {
+        is_prime(i);
+    }
+    end_time = omp_get_wtime();
+    printf("Serial Time: %f seconds\\n", end_time - start_time);
+
+    start_time = omp_get_wtime();
+    #pragma omp parallel for
+    for (int i = 1; i <= n; i++) {
+        is_prime(i);
+    }
+    end_time = omp_get_wtime();
+    printf("Parallel Time: %f seconds\\n", end_time - start_time);
+
+    return 0;
+}`,
     commands: [
       'Create: gedit prg4.c',
-      'Compile: gcc prg4.c -o prg4',
-      'Run: ./prg4',
+      'Compile: gcc -fopenmp prg4.c -o prg4 -lm',
+      'Run: export OMP_NUM_THREADS=4 && ./prg4',
     ],
-    output: 'Positive\nOdd',
+    output: 'Enter the value of n: 200\n\nPrime numbers from 1 to 200:\n2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 \nSerial Time: 0.000006 seconds\nParallel Time: 0.003401 seconds',
   },
   {
     lab: 'pc',
@@ -385,6 +487,7 @@ export interface IoTProgram {
   setup: string;
   code: string;
   result: string;
+  codeImage?: string;
 }
 
 export const iotPrograms: IoTProgram[] = [
@@ -467,30 +570,62 @@ void loop() {
   {
     id: 'iot-02',
     experimentNo: 2,
-    title: '',
-    aim: '',
-    components: [],
+    title: 'Arduino Relay Interfacing',
+    aim: 'Develop a program to interface a relay with Arduino board',
+    components: [{ name: 'Arduino Uno', quantity: '1' },
+      { name: 'Jumper Cable', quantity: '6' },
+      { name: 'Bread Board', quantity: '1' },
+      { name: 'DC Motor', quantity: '1' },
+      { name: 'Relay SPDT', quantity: '1' },
+      { name: '9V Battery', quantity: '1' },],
     circuitDiagram: '/images/iot/circuit-02.png',
-    setup: '',
-    code: '',
-    result: '',
+    setup: `a) Connect the circuit as per circuit.
+b) Make sure VCC and Ground pins connected properly to avoid any damage to Arduino board.
+c) Open Arduino IDE then go to tools and select appropriate Arduino board.
+d) Select tool then select the port select the com port to which board is connected.
+e) Type sketch (Program) and upload to board`,
+    code: `void setup()
+{
+pinMode(13, OUTPUT);
+}
+
+void loop()
+{
+digitalWrite(2, HIGH);
+delay(1000); // Wait for 1000 millisecond(s)
+digitalWrite (13, LOW);
+delay(1000); // Wait for 1000 millisecond(s)
+}
+`,
+    result: 'Successfully demonstrated interface a relay with Arduino board',
   },
   {
     id: 'iot-03',
     experimentNo: 3,
-    title: '',
-    aim: '',
-    components: [],
+    title: 'Intrusion Detection System',
+    aim: 'Develop a program to deploy an intrusion detection system using Ultrasonic and sound sensors.',
+    components: [{ name: 'Arduino Uno', quantity: '1' },
+      { name: 'Jumper Cable', quantity: '6' },
+      { name: 'Bread Board', quantity: '1' },
+      { name: 'LED', quantity: '2' },
+      { name: 'Resistance (800 S2)', quantity: '2' },
+      { name: 'Ultrasonic Distance Sensor (4-pin)', quantity: '1' },
+      { name: 'Piezo', quantity: '1' },],
     circuitDiagram: '/images/iot/circuit-03.png',
-    setup: '',
-    code: '',
-    result: '',
+    setup: `a) Connect the circuit as per circuit.
+b) Make sure VCC and Ground pins connected properly to avoid any damage to Arduino board.
+c) Open Arduino IDE then goto tools and select appropriate Arduino board.
+d) Select tool then select the port select the com port to which board is connected.
+e) Type sketch (Program) and upload to board.`,
+    
+    codeImage: '/images/iot/block-code-03.png',
+    result: 'Successfully demonstrated deploy an intrusion detection system using Ultrasonic and sound sensors.',
   },
   {
     id: 'iot-04',
     experimentNo: 4,
-    title: '',
-    aim: '',
+    title: 'DC Motor Control',
+    aim: 'Develop a program to control a DC motor with Arduino board.',
     components: [],
     circuitDiagram: '/images/iot/circuit-04.png',
     setup: '',
@@ -500,8 +635,8 @@ void loop() {
   {
     id: 'iot-05',
     experimentNo: 5,
-    title: '',
-    aim: '',
+    title: 'Smart Street Light System',
+    aim: 'Develop a program to deploy smart street light system using LDR sensor.',
     components: [],
     circuitDiagram: '/images/iot/circuit-05.png',
     setup: '',
@@ -511,8 +646,8 @@ void loop() {
   {
     id: 'iot-06',
     experimentNo: 6,
-    title: '',
-    aim: '',
+    title: 'Dry Wet Waste Classification',
+    aim: 'Develop a program to classify dry and wet waste with the Moisture sensor (DHT22).',
     components: [],
     circuitDiagram: '/images/iot/circuit-06.png',
     setup: '',
@@ -522,7 +657,7 @@ void loop() {
   {
     id: 'iot-07',
     experimentNo: 7,
-    title: '',
+    title: 'Develop a program to read the pH value of a various substances like milk, lime and water.',
     aim: '',
     components: [],
     circuitDiagram: '/images/iot/circuit-07.png',
@@ -533,9 +668,15 @@ void loop() {
   {
     id: 'iot-08',
     experimentNo: 8,
-    title: '',
-    aim: '',
-    components: [],
+    title: 'Gas Leakage Detection',
+    aim: 'Develop a program to detect the gas leakage in the surrounding environment.',
+    components: [{ name: 'Arduino Uno', quantity: '1' },
+      { name: 'Jumper Cable', quantity: '6' },
+      { name: 'Bread Board', quantity: '1' },
+      { name: 'MQ-2 Gas Sensor', quantity: '1' },
+      { name: 'Buzzer', quantity: '1' },
+      { name: 'LED', quantity: '1' },
+      { name: 'Resistance (800 Ω)', quantity: '1' },],
     circuitDiagram: '/images/iot/circuit-08.png',
     setup: '',
     code: '',

@@ -34,7 +34,7 @@ export function ProgramDetail() {
           <span>{lab.toUpperCase()} LAB #{String(program.number).padStart(2, '0')}</span>
         </div>
         <h1 className="text-4xl font-bold text-white dark:text-white light:text-slate-900 mb-3 break-words">{program.title}</h1>
-        <p className="text-slate-400 dark:text-slate-400 light:text-slate-500 text-lg">{program.description}</p>
+        <p className="text-slate-400 dark:text-slate-400 light:text-slate-500 text-lg whitespace-pre-line">{program.description}</p>
       </div>
 
       <div className="grid gap-6">

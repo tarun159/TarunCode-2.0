@@ -261,10 +261,21 @@ export function IoTProgramDetail() {
             <Code2 className="w-5 h-5 mr-2 text-accent-400" />
             <h2 className="text-lg font-semibold text-white dark:text-white light:text-slate-900">Program Code</h2>
           </div>
-          <CodeViewer
-            code={program.code.trim() || fallbacks.code}
-            language="cpp"
-          />
+          {program.codeImage ? (
+            <div className="overflow-x-auto p-4">
+              <img
+                src={program.codeImage}
+                alt={`Program code for Experiment ${program.experimentNo}`}
+                className="max-w-full w-auto h-auto object-contain mx-auto"
+                style={{ minWidth: 0 }}
+              />
+            </div>
+          ) : (
+            <CodeViewer
+              code={program.code.trim() || fallbacks.code}
+              language="cpp"
+            />
+          )}
         </motion.section>
 
         {/* Result - Full Width (LAST) */}
