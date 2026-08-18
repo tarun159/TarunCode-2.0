@@ -272,7 +272,7 @@ export function IoTProgramDetail() {
             </div>
           ) : (
             <CodeViewer
-              code={program.code.trim() || fallbacks.code}
+              code={program.code?.trim() || fallbacks.code}
               language="cpp"
             />
           )}

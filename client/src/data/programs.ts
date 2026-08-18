@@ -485,7 +485,7 @@ export interface IoTProgram {
   components: IoTComponent[];
   circuitDiagram: string;
   setup: string;
-  code: string;
+  code?: string;
   result: string;
   codeImage?: string;
 }
