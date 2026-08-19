@@ -1,14 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, User, Code, Wifi, LayoutDashboard, Cpu, Sun, Moon } from 'lucide-react';
+import { Menu, X, LogOut, User, Code, Wifi, LayoutDashboard, Cpu, Sun, Moon, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from './Button';
 import { cn } from '@/utils/cn';
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,6 +22,7 @@ export function Navbar() {
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/pc-lab', label: 'PC Lab', icon: Cpu },
     { path: '/iot-lab', label: 'IoT Lab', icon: Wifi },
+    ...(isAdmin ? [{ path: '/admin/user-activity', label: 'Admin', icon: Shield }] : []),
   ];
 
   const isActive = (path: string) =>

@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin identity. This MUST stay in sync with VITE_ADMIN_EMAIL in the
+    // client app's .env.local. Replace the placeholder below with your real
+    // admin account's email address (the same value used for VITE_ADMIN_EMAIL).
+    // Rules cannot read VITE_ADMIN_EMAIL directly, so the email is matched
+    // against the signed-in user's verified Auth email claim, which is the
+    // same identity the app uses to grant admin access.
+    function adminEmail() {
+      return 'tarunsutrave35@gmail.com';
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == adminEmail();
+    }
+
+    // users/{uid} — one document per Firebase Auth account.
+    // Fields stored: username, email, createdAt, lastLoginAt, lastUserAgent.
+    // No passwords are ever stored here (they live in Firebase Auth only).
+    match /users/{userId} {
+
+      // Any signed-in user may read their OWN document.
+      // The admin may read EVERY document — this is what makes the
+      // Admin -> User Activity collection query (getDocs) return all users.
+      // For a normal user the same query would only return their own doc,
+      // because list results are filtered to documents the requester may read.
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || isAdmin());
+
+      // Users may only create/update/delete THEIR OWN document. This keeps the
+      // signup/login flow working (it writes the user's own doc) and stops
+      // anyone from touching another user's record. The admin does not write
+      // other users' docs from the client.
+      allow write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+  }
+}

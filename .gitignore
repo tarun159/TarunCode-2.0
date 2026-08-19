@@ -18,6 +18,11 @@ client/.env.*.local
 *.log
 npm-debug.log*
 
+# Standalone backfill script artifacts (NEVER commit the service-account key)
+scripts/node_modules
+scripts/service-account.json
+scripts/package-lock.json
+
 # OS
 .DS_Store
 .vercel

@@ -15,6 +15,7 @@ import { Documentation } from '@/pages/Documentation';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
+import { AdminUserActivity } from '@/pages/AdminUserActivity';
 import { NotFound } from '@/pages/NotFound';
 import { getProgramsByLab, iotPrograms } from '@/data/programs';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
@@ -42,6 +43,14 @@ function ProtectedRoute() {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
+  return <Outlet />;
+}
+
+function AdminRoute() {
+  const { user, isAdmin } = useAuth();
+  // ProtectedRoute already guarantees a logged-in user; this guard additionally
+  // restricts access to the configured admin account only.
+  if (!user || !isAdmin) return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 }
 
@@ -87,6 +96,9 @@ function App() {
           />
           <Route path="/program/iot/:number" element={<IoTProgramDetail />} />
           <Route path="/program/:lab/:number" element={<ProgramDetail />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/user-activity" element={<AdminUserActivity />} />
+          </Route>
         </Route>
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<NotFound />} />

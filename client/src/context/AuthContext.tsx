@@ -10,14 +10,20 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
+// Admin is identified by email. Set VITE_ADMIN_EMAIL in your .env.local; if it
+// is not configured, no account is treated as admin (the Admin page stays locked).
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
+
 interface User {
   id: string;
   username: string;
   email: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (username: string, email: string, password: string) => Promise<void>;
@@ -28,10 +34,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function mapFirebaseUser(firebaseUser: FirebaseUser, username?: string): User {
+  const email = firebaseUser.email || '';
   return {
     id: firebaseUser.uid,
-    username: username || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-    email: firebaseUser.email || '',
+    username: username || firebaseUser.displayName || email.split('@')[0] || 'User',
+    email,
+    isAdmin: !!ADMIN_EMAIL && email.trim().toLowerCase() === ADMIN_EMAIL,
   };
 }
 
@@ -69,6 +77,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Best-effort activity stamp (Last Login + Device/Browser) read by the Admin
+  // User Activity page. Merge-only so it never overwrites the username/email/
+  // createdAt captured at signup. Errors are swallowed — this must never block
+  // or fail the authentication flow.
+  const recordLogin = useCallback((uid: string) => {
+    if (typeof navigator === 'undefined') return;
+    setDoc(
+      doc(db, 'users', uid),
+      {
+        lastLoginAt: new Date().toISOString(),
+        lastUserAgent: navigator.userAgent,
+      },
+      { merge: true }
+    ).catch(() => {
+      /* non-fatal */
+    });
+  }, []);
+
   const checkAuth = useCallback(async () => {
     // Use onAuthStateChanged to listen for auth state changes.
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -97,6 +123,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Firestore is best-effort and must NOT block navigation. Fire it off and
     // swallow any errors.
     void enrichFromFirestore(res.user);
+    // Non-fatal activity stamp used by the Admin User Activity page. Never
+    // blocks auth or navigation.
+    void recordLogin(res.user.uid);
   };
 
   const signup = async (username: string, email: string, password: string) => {
@@ -113,6 +142,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }).catch(() => {
       /* non-fatal: profile document creation failed; auth already succeeded */
     });
+    // Non-fatal activity stamp used by the Admin User Activity page. Never
+    // blocks auth or navigation.
+    void recordLogin(res.user.uid);
   };
 
   const logout = async () => {
@@ -121,7 +153,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, checkAuth }}>
+    <AuthContext.Provider
+      value={{ user, isAdmin: user?.isAdmin ?? false, loading, login, signup, logout, checkAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );

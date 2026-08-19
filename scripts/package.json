@@ -1,0 +1,13 @@
+{
+  "name": "taruncode-backfill",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone one-time backfill of Firebase Auth users into the users/{uid} Firestore collection. Kept OUTSIDE the client app.",
+  "type": "module",
+  "scripts": {
+    "backfill": "node backfill-users.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

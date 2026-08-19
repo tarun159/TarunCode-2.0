@@ -1,0 +1,8 @@
+# Local dependencies
+node_modules/
+
+# Private service-account key — NEVER commit
+service-account.json
+
+# Lockfile for this standalone tool
+package-lock.json
