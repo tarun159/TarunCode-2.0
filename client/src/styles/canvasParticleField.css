@@ -1,0 +1,23 @@
+/* Reusable Canvas particle field used on the Admin, PC Lab and IoT Lab pages.
+   The canvas is fixed, full-viewport, behind all page content (z-index:-1 within
+   the main stacking context) and inert to interaction (pointer-events:none). The
+   cards / table / text paint on top and stay fully readable and clickable. The
+   same visual language is used on every page — no per-page colour themes. */
+
+.canvas-particle-field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
+
+/* ---------- REDUCED MOTION: off the continuous loop ----------
+   (CanvasParticleField renders one faint static frame instead; no rAF work.) */
+@media (prefers-reduced-motion: reduce) {
+  .canvas-particle-field {
+    opacity: 0.5;
+  }
+}

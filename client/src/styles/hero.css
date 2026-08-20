@@ -210,6 +210,78 @@
     background-position 1.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ---------- CALM ENERGY RIPPLES ---------- */
+/* Concentric rings that begin as a small circle just outside the central
+   glow (a visible gap — they never touch the core), expand slowly outward and
+   fade as they reach the edge. They are NOT rotating and NOT bouncing; each
+   ring is a transform: scale() of the same circular outline so motion is a
+   pure, even radial swell. Three rings staggered in phase keep the wave
+   continuous. Colour follows the shared palette (amber / cyan / violet) and
+   the directional --lab-op so they adopt the active lab's hue. */
+.lab-ripples {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64%;
+  height: 64%;
+  transform: translate(-50%, -50%) translateZ(35px);
+  pointer-events: none;
+}
+.lab-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--c1), 0.55);
+  box-shadow: 0 0 10px rgba(var(--c1), 0.22);
+  /* Start just outside the central glow (~0.9 of the 64% container puts the
+     ring at ~29% of the field, leaving a clear gap past the ~23% core) and at
+     low opacity; swell outward and fade near the edge. */
+  transform: scale(0.9);
+  opacity: 0;
+  transform-origin: center;
+  animation: lab-ripple-swell 9s linear infinite;
+}
+.lab-ripple:nth-child(2) { animation-delay: 3s; }
+.lab-ripple:nth-child(3) { animation-delay: 6s; }
+
+@keyframes lab-ripple-swell {
+  0%   { transform: scale(0.9); opacity: 0; }
+  8%   { opacity: 0.5; }
+  70%  { opacity: 0.22; }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+
+/* ---------- TINY HOLOGRAPHIC ENERGY POINTS ---------- */
+/* Small digital motes placed around the field. Each brightens softly and
+   fades on its own schedule (per-element delay + duration), so they never
+   blink in unison and stay well below the heading/cards in prominence. */
+.lab-energy-points {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(48px);
+  pointer-events: none;
+}
+.lab-energy-point {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px;
+  border-radius: 50%;
+  background: rgba(var(--c1), 0.9);
+  box-shadow: 0 0 6px rgba(var(--c1), 0.65);
+  transform: scale(0.35);
+  opacity: 0;
+  animation-name: lab-point-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes lab-point-twinkle {
+  0%, 100% { transform: scale(0.3); opacity: 0; }
+  45%      { transform: scale(1); opacity: 0.85; }
+  60%      { transform: scale(1); opacity: 0.7; }
+  80%      { transform: scale(0.6); opacity: 0; }
+}
+
 /* ---------- ENERGY STREAMS (curved, flowing) ---------- */
 .lab-streams {
   position: absolute;
@@ -371,7 +443,9 @@
   .lab-core,
   .lab-orb,
   .lab-stream-line,
-  .lab-particle {
+  .lab-particle,
+  .lab-ripple,
+  .lab-energy-point {
     animation: none !important;
   }
   /* Keep a directional colour response to lab hover, but disable the
@@ -386,6 +460,8 @@
   .lab-particle { opacity: 0.4; }
   .lab-stream-dot { display: none !important; }
   .lab-stream-line { opacity: 0.4; }
+  /* Static, barely-there energy points (no twinkle). */
+  .lab-energy-point { opacity: 0.35; transform: scale(0.7); }
 }
 
 /* ---------- SIMPLIFIED (mobile / no-hover) ---------- */
@@ -413,6 +489,16 @@
   transform: none;
 }
 .lab-bg.is-simplified .lab-particle { animation: none; opacity: 0.45; }
+/* Keep the field lightweight on phones: the circular ripples stay visible
+   (same concept as desktop) but are softened — a dimmer stroke + slightly
+   slower swell so they read as a calm, subtle wave without competing with the
+   stacked cards. They remain continuous and never removed. */
+.lab-bg.is-simplified .lab-ripple {
+  border-color: rgba(var(--c1), 0.34);
+  box-shadow: 0 0 8px rgba(var(--c1), 0.14);
+  animation-duration: 11s;
+}
+.lab-bg.is-simplified .lab-energy-point { animation-duration: 9s; opacity: 0.5; }
 .lab-bg.is-simplified .lab-heading-glow { transform: translate(-50%, -50%); }
 
 /* Slightly smaller field on phones so it stays comfortably in view. */

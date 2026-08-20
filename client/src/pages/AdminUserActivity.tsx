@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { BackButton } from '@/components/BackButton';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorState } from '@/components/ErrorState';
+import { AdminRain } from '@/components/AdminRain';
 
 interface UserRow {
   id: string;
@@ -94,6 +95,8 @@ export function AdminUserActivity() {
 
   return (
     <div className="pt-8 min-w-0">
+      {/* Admin-only decorative "Digital Rain" — atmospheric, behind all content. */}
+      <AdminRain />
       <BackButton to="/dashboard" label="Back to Dashboard" />
 
       <motion.div

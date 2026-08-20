@@ -18,12 +18,10 @@ import { Dashboard } from '@/pages/Dashboard';
 import { AdminUserActivity } from '@/pages/AdminUserActivity';
 import { NotFound } from '@/pages/NotFound';
 import { getProgramsByLab, iotPrograms } from '@/data/programs';
-import { AnimatedBackground } from '@/components/AnimatedBackground';
 
 function AppShell() {
   return (
     <div className="min-h-screen flex flex-col relative">
-      <AnimatedBackground />
       <Navbar />
       <main className="flex-1 container mx-auto px-4 pt-24 pb-10 relative z-10">
         <Outlet />

@@ -5,6 +5,7 @@ import { IoTProgram } from '@/data/programs';
 import { IoTProgramCard } from './IoTProgramCard';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { ErrorState } from '../ErrorState';
+import { CanvasParticleField } from '../CanvasParticleField';
 
 interface IoTProgramListProps {
   programs: IoTProgram[];
@@ -45,6 +46,11 @@ export function IoTProgramList({ programs, isLoading, error }: IoTProgramListPro
 
   return (
     <div className="pt-8">
+      {/* Shared TarunCode digital particle environment — same system + palette as
+         the Admin page and PC Lab. Sits behind the glass cards (fixed, z-index:-1,
+         pointer-events:none). Desktop 60–90 particles, mobile 25–45. No IoT-specific
+         colour theme — identical visual language across pages. */}
+      <CanvasParticleField densityDesktop={[60, 90]} densityMobile={[25, 45]} />
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white dark:text-white light:text-slate-900 mb-2 flex items-center gap-2">

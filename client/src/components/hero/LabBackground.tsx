@@ -82,6 +82,19 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
     { size: '56%', z: '60px', pf: '1.7', delay: '2.2s', dur: '10.5s', td: '0.24s' },
   ];
 
+  // Tiny holographic energy points — distributed around the field, each with
+  // its own animation delay + duration so they twinkle independently.
+  const energyPoints = [
+    { top: '16%', left: '38%', d: '0s', dur: '6.5s' },
+    { top: '12%', left: '62%', d: '2.1s', dur: '7.8s' },
+    { top: '30%', left: '82%', d: '4.3s', dur: '6.9s' },
+    { top: '24%', left: '14%', d: '1.4s', dur: '8.2s' },
+    { top: '46%', left: '90%', d: '3.6s', dur: '7.2s' },
+    { top: '52%', left: '9%', d: '5.1s', dur: '6.4s' },
+    { top: '40%', left: '47%', d: '2.8s', dur: '9.1s' },
+    { top: '18%', left: '24%', d: '6.0s', dur: '7.5s' },
+  ];
+
   // Two depth tiers of particles.
   const farParticles = [
     { top: '20%', left: '14%', px: '10px', py: '-14px', d: '0s' },
@@ -121,6 +134,18 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
       {/* Central holographic energy field */}
       <div className={`lab-field ${leanClass}`}>
         <div className="lab-field-glow" />
+
+        {/* Calm energy ripples: concentric rings that begin just outside the
+           central glow (a visible gap), expand slowly outward and fade near the
+           edge. They never touch the core and are not rotating. Colour follows
+           the shared palette, so they adopt amber / cyan / violet automatically
+           and respect the directional propagation. */}
+        <div className="lab-ripples" aria-hidden="true">
+          <span className="lab-ripple" />
+          <span className="lab-ripple" />
+          <span className="lab-ripple" />
+        </div>
+
         {rings.map((r, i) => (
           <div
             key={i}
@@ -137,6 +162,19 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
           />
         ))}
         <div className="lab-core" />
+
+        {/* Tiny holographic energy points — small digital motes that brighten
+           softly and fade, each on its own schedule so they never pulse in
+           unison. They reuse the palette colour (amber / cyan / violet). */}
+        <div className="lab-energy-points" aria-hidden="true">
+          {energyPoints.map((p, i) => (
+            <span
+              key={`ep-${i}`}
+              className="lab-energy-point"
+              style={{ top: p.top, left: p.left, animationDelay: p.d, animationDuration: p.dur }}
+            />
+          ))}
+      </div>
       </div>
 
       {/* Curved energy streams toward each lab + travelling dots */}
