@@ -48,21 +48,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Best-effort Firestore enrichment: read the profile to refine the username
-  // and create the document when it is missing. NEVER throws or blocks auth —
-  // every Firestore call is wrapped so a failure is swallowed and auth proceeds.
+  // and create the document when it is genuinely missing. NEVER throws or
+  // blocks auth — every Firestore call is wrapped so a failure is swallowed and
+  // auth proceeds.
+  //
+  // CRITICAL: createdAt is written ONLY when the document is confirmed missing
+  // (exists() === false after a successful read). We never overwrite createdAt
+  // on a subsequent login — doing so would reset "Account Created" to the login
+  // time. If the read itself fails, we bail without writing anything, so a
+  // transient error can never clobber a real createdAt.
   const enrichFromFirestore = useCallback(async (firebaseUser: FirebaseUser) => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid)).catch(() => null);
-      if (userDoc && userDoc.exists()) {
+      const ref = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(ref).catch(() => null);
+      // Could not read the profile (network/permission error). Do NOT attempt to
+      // create it — that risks overwriting a real createdAt with the login time.
+      if (!userDoc) return;
+
+      if (userDoc.exists()) {
         const username = userDoc.data()?.username;
         if (username) {
+          // Normal case on every login: doc present with a username. No writes.
           setUser((prev) => (prev ? { ...prev, username } : mapFirebaseUser(firebaseUser, username)));
           return;
         }
+        // Doc exists but username is missing — repair username/email only.
+        // createdAt is left untouched (it already exists on this doc).
+        await setDoc(
+          ref,
+          {
+            username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+            email: firebaseUser.email || '',
+          },
+          { merge: true }
+        ).catch(() => {
+          /* non-fatal: username repair failed; auth already succeeded */
+        });
+        return;
       }
-      // Profile missing (or unreadable) — try to create it best-effort.
+
+      // Genuinely new profile (successful read, confirmed missing) — set
+      // createdAt exactly once, here at first creation.
       await setDoc(
-        doc(db, 'users', firebaseUser.uid),
+        ref,
         {
           username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
           email: firebaseUser.email || '',

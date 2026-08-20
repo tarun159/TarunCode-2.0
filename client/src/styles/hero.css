@@ -1,0 +1,302 @@
+/* ============================================================
+   "Holographic Energy Field" — Dashboard background atmosphere
+   A large, dimensional, living 3D energy environment behind the
+   Welcome content. Pure CSS 3D + SVG (no WebGL, no new deps).
+   Every layer is pointer-events:none and sits at z-index:-1.
+   Motion is confined to transform/opacity (compositor-friendly).
+   ============================================================ */
+
+.lab-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  perspective: 1000px;
+  perspective-origin: 50% 34%;
+  transform-style: preserve-3d;
+  --mx: 0;
+  --my: 0;
+  --leanX: 0px;
+}
+
+/* ---------- CENTRAL HOLOGRAPHIC ENERGY FIELD ---------- */
+.lab-field {
+  position: absolute;
+  left: 50%;
+  top: 23%;
+  width: min(620px, 92vw);
+  height: min(620px, 92vw);
+  transform-style: preserve-3d;
+  /* Mouse parallax + active-lab lean, both on the same transform so they
+     compose smoothly. Centered via -50% then offset. */
+  transform: translate(
+    calc(-50% + var(--mx, 0) * 16px + var(--leanX, 0px)),
+    calc(-50% + var(--my, 0) * 11px)
+  );
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.lab-field.lean-pc { --leanX: -26px; }
+.lab-field.lean-iot { --leanX: 26px; }
+
+/* Wide ambient glow that reads as the field's volume. */
+.lab-field-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130%;
+  height: 130%;
+  transform: translate(-50%, -50%) translateZ(-40px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(56, 189, 248, 0.22),
+    rgba(99, 102, 241, 0.12) 38%,
+    rgba(217, 70, 239, 0.10) 58%,
+    transparent 72%);
+  filter: blur(22px);
+  animation: lab-field-glow-breathe 11s ease-in-out infinite;
+}
+
+/* Translucent concentric rings — the depth structure of the field.
+   Each ring is centered, then offset by its own parallax factor (--pf)
+   and depth (--z) so layers move at different speeds. */
+.lab-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate3d(
+    calc(-50% + var(--mx, 0) * var(--pf, 0.6) * 14px),
+    calc(-50% + var(--my, 0) * var(--pf, 0.6) * 10px),
+    var(--z, 0px)
+  );
+  border-width: 1px;
+  border-style: solid;
+  animation: lab-ring-breathe 9s ease-in-out infinite;
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+.lab-ring.cyan {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow:
+    0 0 34px rgba(56, 189, 248, 0.20),
+    inset 0 0 28px rgba(56, 189, 248, 0.10);
+}
+.lab-ring.violet {
+  border-color: rgba(217, 70, 239, 0.50);
+  box-shadow:
+    0 0 34px rgba(217, 70, 239, 0.18),
+    inset 0 0 28px rgba(217, 70, 239, 0.10);
+}
+
+/* Luminous, multi-colour core — soft depth, not a solid object. */
+.lab-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46%;
+  height: 46%;
+  transform: translate(-50%, -50%) translateZ(70px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(224, 242, 254, 0.95) 0%,
+    rgba(56, 189, 248, 0.55) 16%,
+    rgba(99, 102, 241, 0.28) 38%,
+    rgba(217, 70, 239, 0.16) 58%,
+    transparent 74%);
+  filter: blur(7px);
+  animation: lab-core-breathe 8s ease-in-out infinite;
+  transition: background 0.6s ease;
+}
+
+/* Subtle brightening of the core toward the active lab's colour. */
+.lab-field.lean-pc .lab-core {
+  background: radial-gradient(circle at 50% 50%,
+    rgba(224, 242, 254, 0.95) 0%,
+    rgba(56, 189, 248, 0.7) 18%,
+    rgba(99, 102, 241, 0.30) 40%,
+    rgba(217, 70, 239, 0.10) 60%,
+    transparent 74%);
+}
+.lab-field.lean-iot .lab-core {
+  background: radial-gradient(circle at 50% 50%,
+    rgba(250, 232, 255, 0.95) 0%,
+    rgba(217, 70, 239, 0.6) 18%,
+    rgba(168, 85, 247, 0.32) 40%,
+    rgba(56, 189, 248, 0.10) 60%,
+    transparent 74%);
+}
+
+/* ---------- ENERGY STREAMS (curved, flowing) ---------- */
+.lab-streams {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: translate(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -5px));
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lab-stream-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 2.5 5;
+  opacity: 0.5;
+  animation: lab-stream-flow 4.5s linear infinite;
+  transition: opacity 0.5s ease, stroke-width 0.5s ease;
+  filter: drop-shadow(0 0 1.5px currentColor);
+}
+.lab-stream-line.to-pc { stroke: rgb(56, 189, 248); color: rgb(56, 189, 248); }
+.lab-stream-line.to-iot { stroke: rgb(217, 70, 239); color: rgb(217, 70, 239); }
+.lab-stream-line.is-active {
+  opacity: 0.95;
+  stroke-width: 1.2;
+  animation-duration: 1.9s;
+}
+.lab-stream-dot { opacity: 0.95; }
+.lab-stream-dot.to-pc { fill: rgb(165, 220, 255); }
+.lab-stream-dot.to-iot { fill: rgb(245, 195, 255); }
+
+/* ---------- AMBIENT COLOUR ORBS (depth) ---------- */
+.lab-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(46px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.lab-orb-a {
+  width: 320px; height: 320px;
+  left: 4%; bottom: 6%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.34), transparent 70%);
+  transform: translateZ(-140px) translate(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 9px));
+  animation: lab-orb-a 26s ease-in-out infinite;
+}
+.lab-orb-b {
+  width: 300px; height: 300px;
+  right: 3%; bottom: 10%;
+  background: radial-gradient(circle, rgba(217, 70, 239, 0.28), transparent 70%);
+  transform: translateZ(-100px) translate(calc(var(--mx, 0) * -14px), calc(var(--my, 0) * 7px));
+  animation: lab-orb-b 32s ease-in-out infinite;
+}
+
+/* ---------- DATA PARTICLES (two depths) ---------- */
+.lab-particles { position: absolute; inset: 0; transform-style: preserve-3d; }
+.lab-particles-far {
+  transform: translateZ(-120px) translate(calc(var(--mx, 0) * 16px), calc(var(--my, 0) * 12px));
+}
+.lab-particles-near {
+  transform: translateZ(-30px) translate(calc(var(--mx, 0) * -26px), calc(var(--my, 0) * -18px));
+}
+.lab-particle {
+  position: absolute;
+  width: 3px; height: 3px; margin: -1.5px;
+  border-radius: 999px;
+  background: rgba(186, 230, 253, 0.85);
+  box-shadow: 0 0 7px rgba(56, 189, 248, 0.6);
+  opacity: 0;
+  animation: lab-particle-drift 15s ease-in-out infinite;
+}
+.lab-particles-far .lab-particle {
+  width: 2px; height: 2px; margin: -1px;
+  background: rgba(125, 211, 252, 0.6);
+  animation-duration: 19s;
+}
+.lab-particles-near .lab-particle {
+  box-shadow: 0 0 9px rgba(56, 189, 248, 0.7);
+}
+
+/* ---------- HEADING ATMOSPHERIC GLOW ---------- */
+.lab-heading-glow {
+  position: absolute;
+  left: 50%;
+  top: 21%;
+  width: 560px;
+  max-width: 92vw;
+  height: 240px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center,
+    rgba(56, 189, 248, 0.16),
+    rgba(217, 70, 239, 0.07) 45%,
+    transparent 72%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+/* ---------- KEYFRAMES ---------- */
+@keyframes lab-field-glow-breathe {
+  0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) translateZ(-40px) scale(0.96); }
+  50% { opacity: 1; transform: translate(-50%, -50%) translateZ(-40px) scale(1.06); }
+}
+@keyframes lab-ring-breathe {
+  0%, 100% { transform: translate3d(calc(-50% + var(--mx, 0) * var(--pf, 0.6) * 14px), calc(-50% + var(--my, 0) * var(--pf, 0.6) * 10px), var(--z, 0px)) scale(0.97); opacity: 0.7; }
+  50% { transform: translate3d(calc(-50% + var(--mx, 0) * var(--pf, 0.6) * 14px), calc(-50% + var(--my, 0) * var(--pf, 0.6) * 10px), var(--z, 0px)) scale(1.03); opacity: 0.95; }
+}
+@keyframes lab-core-breathe {
+  0%, 100% { transform: translate(-50%, -50%) translateZ(70px) scale(0.95); opacity: 0.85; }
+  50% { transform: translate(-50%, -50%) translateZ(70px) scale(1.05); opacity: 1; }
+}
+@keyframes lab-orb-a {
+  0%, 100% { transform: translateZ(-140px) translate(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 9px)) scale(1); }
+  50% { transform: translateZ(-140px) translate(calc(var(--mx, 0) * 12px + 22px), calc(var(--my, 0) * 9px + 26px)) scale(1.08); }
+}
+@keyframes lab-orb-b {
+  0%, 100% { transform: translateZ(-100px) translate(calc(var(--mx, 0) * -14px), calc(var(--my, 0) * 7px)) scale(1); }
+  50% { transform: translateZ(-100px) translate(calc(var(--mx, 0) * -14px - 24px), calc(var(--my, 0) * 7px + 18px)) scale(1.06); }
+}
+@keyframes lab-stream-flow { to { stroke-dashoffset: -30; } }
+@keyframes lab-particle-drift {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  15% { opacity: 0.8; }
+  50% { transform: translate(var(--px, 16px), var(--py, -22px)) scale(1); opacity: 0.55; }
+  85% { opacity: 0.3; }
+  100% { transform: translate(calc(var(--px, 16px) * -0.4), calc(var(--py, -22px) * 1.2)) scale(0.5); opacity: 0; }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .lab-field,
+  .lab-field-glow,
+  .lab-ring,
+  .lab-core,
+  .lab-orb,
+  .lab-stream-line,
+  .lab-particle {
+    animation: none !important;
+  }
+  .lab-particle { opacity: 0.4; }
+  .lab-stream-dot { display: none !important; }
+  .lab-stream-line { opacity: 0.4; }
+}
+
+/* ---------- SIMPLIFIED (mobile / no-hover) ---------- */
+.lab-bg.is-simplified .lab-field {
+  transform: translate(-50%, -50%);
+}
+.lab-bg.is-simplified .lab-ring {
+  transform: translate3d(-50%, -50%, var(--z, 0px));
+  animation: none;
+}
+.lab-bg.is-simplified .lab-core {
+  transform: translate(-50%, -50%) translateZ(0);
+  animation: none;
+}
+.lab-bg.is-simplified .lab-field-glow { animation: none; }
+.lab-bg.is-simplified .lab-orb {
+  transform: none !important;
+  animation: none;
+  opacity: 0.45;
+}
+/* On small screens, hide the streams so they never cross stacked text/cards. */
+.lab-bg.is-simplified .lab-streams { display: none; }
+.lab-bg.is-simplified .lab-particles-far { display: none; }
+.lab-bg.is-simplified .lab-particles-near {
+  transform: none;
+}
+.lab-bg.is-simplified .lab-particle { animation: none; opacity: 0.45; }
+.lab-bg.is-simplified .lab-heading-glow { transform: translate(-50%, -50%); }
+
+/* Slightly smaller field on phones so it stays comfortably in view. */
+@media (max-width: 768px) {
+  .lab-field { width: min(520px, 94vw); height: min(520px, 94vw); }
+}
