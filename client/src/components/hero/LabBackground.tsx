@@ -69,14 +69,17 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
   };
 
   const leanClass = activeLab === 'pc' ? 'lean-pc' : activeLab === 'iot' ? 'lean-iot' : '';
+  const stateClass = activeLab === 'pc' ? 'state-pc' : activeLab === 'iot' ? 'state-iot' : '';
   const pcActive = activeLab === 'pc';
   const iotActive = activeLab === 'iot';
 
-  // Concentric rings: size, colour, depth (--z), and parallax factor (--pf).
+  // Concentric rings: size, depth (--z), and parallax factor (--pf).
+  // Colour is driven by the shared palette variables (amber default →
+  // cyan/violet via .state-pc / .state-iot), so the rings interpolate smoothly.
   const rings = [
-    { size: '92%', color: 'cyan', z: '20px', pf: '0.9', delay: '0s', dur: '8.5s' },
-    { size: '74%', color: 'violet', z: '40px', pf: '1.3', delay: '1.1s', dur: '9.5s' },
-    { size: '56%', color: 'cyan', z: '60px', pf: '1.7', delay: '2.2s', dur: '10.5s' },
+    { size: '92%', z: '20px', pf: '0.9', delay: '0s', dur: '8.5s', td: '0s' },
+    { size: '74%', z: '40px', pf: '1.3', delay: '1.1s', dur: '9.5s', td: '0.12s' },
+    { size: '56%', z: '60px', pf: '1.7', delay: '2.2s', dur: '10.5s', td: '0.24s' },
   ];
 
   // Two depth tiers of particles.
@@ -107,7 +110,7 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
   return (
     <div
       ref={stageRef}
-      className={`lab-bg ${simplified ? 'is-simplified' : ''} ${reducedMotion ? 'is-reduced' : ''}`}
+      className={`lab-bg ${stateClass} ${simplified ? 'is-simplified' : ''} ${reducedMotion ? 'is-reduced' : ''}`}
       onPointerMove={handlePointerMove}
       aria-hidden="true"
     >
@@ -121,7 +124,7 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
         {rings.map((r, i) => (
           <div
             key={i}
-            className={`lab-ring ${r.color}`}
+            className="lab-ring"
             style={{
               width: r.size,
               height: r.size,
@@ -129,6 +132,7 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
               ['--pf' as string]: r.pf,
               animationDelay: r.delay,
               animationDuration: r.dur,
+              transitionDelay: r.td,
             }}
           />
         ))}
