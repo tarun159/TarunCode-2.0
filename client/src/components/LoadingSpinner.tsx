@@ -5,19 +5,39 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-3',
-    lg: 'w-12 h-12 border-4',
-  };
+const sizeClass: Record<NonNullable<LoadingSpinnerProps['size']>, string> = {
+  sm: 'tsp-loader--sm',
+  md: 'tsp-loader--md',
+  lg: 'tsp-loader--lg',
+};
 
+/**
+ * TarunCode Premium Energy Orb Loader.
+ *
+ * A compact, volumetric holographic sphere — deep blue core with electric
+ * blue, cyan and subtle violet tones at the outer surface. Slow internal
+ * energy movement and a gentle atmospheric glow. Pure CSS animation; the
+ * component mounts/unmounts with the real loading state, so there is no
+ * artificial delay.
+ */
+export function LoadingSpinner({ size = 'lg', className }: LoadingSpinnerProps) {
   return (
-    <div className={cn('flex items-center justify-center', className)}>
-      <svg className={cn('animate-spin text-primary-500', sizeClasses[size])} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-      </svg>
+    <div
+      className={cn('tsp-loader', sizeClass[size], className)}
+      role="status"
+      aria-live="polite"
+      aria-label="TARUNCODE is loading"
+    >
+      <div className="tsp-loader__sphere">
+        <div className="tsp-loader__energy-surface">
+          <div className="tsp-loader__energy-ring" />
+        </div>
+        <div className="tsp-loader__bloom" />
+        <div className="tsp-loader__center">
+          <span className="tsp-loader__brand">TARUNCODE</span>
+          <span className="tsp-loader__status">Loading</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -32,7 +52,13 @@ export function LoadingOverlay() {
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('skeleton dark:from-surface-800 dark:via-surface-700 dark:to-surface-800 light:from-slate-200 light:via-slate-300 light:to-slate-200', className)} aria-hidden="true" />
+    <div
+      className={cn(
+        'skeleton dark:from-surface-800 dark:via-surface-700 dark:to-surface-800 light:from-slate-200 light:via-slate-300 light:to-slate-200',
+        className,
+      )}
+      aria-hidden="true"
+    />
   );
 }
 
