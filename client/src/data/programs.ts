@@ -266,30 +266,106 @@ int main() {
   {
     lab: 'pc',
     number: 5,
-    title: 'Loops - For, While, Do-While',
-    description: 'Master different loop constructs to perform repetitive tasks.',
+    title: 'MPI Send and Receive',
+    description: 'Write a MPI Program to demonstration of MPI_Send and MPI_Recv.',
     language: 'c',
-    code: ``,
+    code: `#include <mpi.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    int rank, size;
+    int number;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    if (size < 2) {
+        if (rank == 0)
+            printf("Please run with at least 2 processes.\\n");
+        MPI_Finalize();
+        return 0;
+    }
+
+    if (rank == 0) {
+        number = 100;
+        printf("Process %d sending number %d to process 1\\n", rank, number);
+        MPI_Send(&number, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+        MPI_Recv(&number, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("Process %d received number %d from process 0\\n", rank, number);
+    }
+
+    MPI_Finalize();
+    return 0;
+}`,
     commands: [
       'Create: gedit prg5.c',
-      'Compile: gcc prg5.c -o prg5',
-      'Run: ./prg5',
+      'Compile: mpicc prg5.c -o prg5',
+      'Run: mpirun -np 2 ./prg5',
     ],
-    output: '1 2 3 4 5\nSum: 15\nTable of 5',
+    output: 'Process 0 sending number 100 to process 1\nProcess 1 received number 100 from process 0',
   },
   {
     lab: 'pc',
     number: 6,
-    title: 'Arrays - 1D and 2D',
-    description: 'Work with one-dimensional and two-dimensional arrays.',
+    title: 'MPI Deadlock Demonstration',
+    description: 'Write a MPI program to demonstration of deadlock using point to point communication and avoidance of deadlock by altering the call sequence.',
     language: 'c',
-    code: ``,
+    code: `#include <mpi.h>
+#include <stdio.h>
+
+// Change this to 1 for deadlock, 2 for deadlock avoidance
+#define DEADLOCK_PART 2
+
+int main(int argc, char *argv[]) {
+    int rank, size, num = 123;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    if (size < 2) {
+        if (rank == 0)
+            printf("Run with at least 2 processes.\\n");
+        MPI_Finalize();
+        return 0;
+    }
+
+#if DEADLOCK_PART == 1
+    // ----------- Part A: Deadlock -----------
+    if (rank == 0) {
+        printf("Process 0 waiting to receive from Process 1...\\n");
+        MPI_Recv(&num, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Send(&num, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+        printf("Process 1 waiting to receive from Process 0...\\n");
+        MPI_Recv(&num, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Send(&num, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    }
+
+#elif DEADLOCK_PART == 2
+    // ----------- Part B: Deadlock Avoidance -----------
+    if (rank == 0) {
+        MPI_Send(&num, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+        MPI_Recv(&num, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("Process 0 received back number: %d\\n", num);
+    } else if (rank == 1) {
+        MPI_Recv(&num, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Send(&num, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+        printf("Process 1 received and sent back number: %d\\n", num);
+    }
+#endif
+
+    MPI_Finalize();
+    return 0;
+}`,
     commands: [
       'Create: gedit prg6.c',
-      'Compile: gcc prg6.c -o prg6',
-      'Run: ./prg6',
+      'Compile: mpicc prg6.c -o prg6',
+      'Run: mpirun -np 2 ./prg6',
     ],
-    output: 'Max, Min, Average\nMatrix sum',
+    output: 'Process 0 waiting to receive from Process 1...\nProcess 1 waiting to receive from Process 0...',
   },
   {
     lab: 'pc',
