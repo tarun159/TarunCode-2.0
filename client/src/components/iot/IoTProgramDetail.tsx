@@ -30,11 +30,15 @@ function Lightbox({
   onClose,
   src,
   alt,
+  src2,
+  alt2,
 }: {
   isOpen: boolean;
   onClose: () => void;
   src: string;
   alt: string;
+  src2?: string;
+  alt2?: string;
 }) {
   useEffect(() => {
     if (!isOpen) return;
@@ -79,11 +83,32 @@ function Lightbox({
           >
             <X className="w-5 h-5" />
           </button>
-          <img
-            src={src}
-            alt={alt}
-            className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg border border-white/10 shadow-2xl"
-          />
+          {src2 ? (
+            // Two images side by side
+            <div className="flex flex-col lg:flex-row gap-4 items-center justify-center max-w-[95vw] max-h-[90vh]">
+              <div className="flex-1">
+                <img
+                  src={src}
+                  alt={alt}
+                  className="max-w-full max-h-[70vh] w-auto h-auto object-contain rounded-lg border border-white/10 shadow-xl"
+                />
+              </div>
+              <div className="flex-1">
+                <img
+                  src={src2}
+                  alt={alt2 || ''}
+                  className="max-w-full max-h-[70vh] w-auto h-auto object-contain rounded-lg border border-white/10 shadow-xl"
+                />
+              </div>
+            </div>
+          ) : (
+            // Single image
+            <img
+              src={src}
+              alt={alt}
+              className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg border border-white/10 shadow-2xl"
+            />
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -199,35 +224,102 @@ export function IoTProgramDetail() {
           >
             <SectionHeader icon={ImageIcon} label="Circuit Diagram" />
             <div className="p-4 pt-3 pb-4">
-              <div className="relative overflow-hidden rounded-lg border border-white/10 dark:border-white/10 light:border-slate-200/50 bg-surface-950 dark:bg-surface-950 light:bg-slate-100 group cursor-zoom-in"
-                onClick={handleImageClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleImageClick(); }}
-                aria-label="Click to enlarge circuit diagram"
-              >
-                <img
-                  src={program.circuitDiagram}
-                  alt={`Circuit diagram for Experiment ${program.experimentNo}`}
-                  loading="lazy"
-                  className={cn(
-                    'w-full h-auto max-h-[520px] object-contain',
-                    'transition-all duration-500 ease-out',
-                    'group-hover:scale-[1.015] group-hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.3)]'
-                  )}
-                />
-                {/* Hover overlay with zoom icon */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-black/10 light:group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="transform transition-all duration-300 scale-90 group-hover:scale-100">
-                    <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
-                      <ZoomIn className="w-6 h-6 text-surface-900" />
+              {program.circuitDiagram2 ? (
+                // Two diagrams layout
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* First Circuit Diagram */}
+                    <div className="relative overflow-hidden rounded-lg border border-white/10 dark:border-white/10 light:border-slate-200/50 bg-surface-950 dark:bg-surface-950 light:bg-slate-100 group cursor-zoom-in"
+                      onClick={() => setIsLightboxOpen(true)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsLightboxOpen(true); }}
+                      aria-label="Click to enlarge circuit diagram"
+                    >
+                      <img
+                        src={program.circuitDiagram}
+                        alt={`Circuit diagram for Experiment ${program.experimentNo}`}
+                        loading="lazy"
+                        className={cn(
+                          'w-full h-auto max-h-[400px] object-contain',
+                          'transition-all duration-500 ease-out',
+                          'group-hover:scale-[1.015] group-hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.3)]'
+                        )}
+                      />
+                      {/* Hover overlay with zoom icon */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-black/10 light:group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="transform transition-all duration-300 scale-90 group-hover:scale-100">
+                          <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
+                            <ZoomIn className="w-5 h-5 text-surface-900" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <p className="mt-2 text-xs font-medium text-white/80 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
-                      Click to enlarge
-                    </p>
+
+                    {/* Second Circuit Diagram */}
+                    <div className="relative overflow-hidden rounded-lg border border-white/10 dark:border-white/10 light:border-slate-200/50 bg-surface-950 dark:bg-surface-950 light:bg-slate-100 group cursor-zoom-in"
+                      onClick={() => setIsLightboxOpen(true)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsLightboxOpen(true); }}
+                      aria-label="Click to enlarge second circuit diagram"
+                    >
+                      <img
+                        src={program.circuitDiagram2}
+                        alt={`Second circuit diagram for Experiment ${program.experimentNo}`}
+                        loading="lazy"
+                        className={cn(
+                          'w-full h-auto max-h-[400px] object-contain',
+                          'transition-all duration-500 ease-out',
+                          'group-hover:scale-[1.015] group-hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.3)]'
+                        )}
+                      />
+                      {/* Hover overlay with zoom icon */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-black/10 light:group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="transform transition-all duration-300 scale-90 group-hover:scale-100">
+                          <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
+                            <ZoomIn className="w-5 h-5 text-surface-900" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500 text-center">
+                    Click on any diagram to enlarge
+                  </p>
+                </div>
+              ) : (
+                // Single diagram layout (original)
+                <div className="relative overflow-hidden rounded-lg border border-white/10 dark:border-white/10 light:border-slate-200/50 bg-surface-950 dark:bg-surface-950 light:bg-slate-100 group cursor-zoom-in"
+                  onClick={handleImageClick}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleImageClick(); }}
+                  aria-label="Click to enlarge circuit diagram"
+                >
+                  <img
+                    src={program.circuitDiagram}
+                    alt={`Circuit diagram for Experiment ${program.experimentNo}`}
+                    loading="lazy"
+                    className={cn(
+                      'w-full h-auto max-h-[520px] object-contain',
+                      'transition-all duration-500 ease-out',
+                      'group-hover:scale-[1.015] group-hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.3)]'
+                    )}
+                  />
+                  {/* Hover overlay with zoom icon */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-black/10 light:group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="transform transition-all duration-300 scale-90 group-hover:scale-100">
+                      <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20">
+                        <ZoomIn className="w-6 h-6 text-surface-900" />
+                      </div>
+                      <p className="mt-2 text-xs font-medium text-white/80 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                        Click to enlarge
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </motion.section>
 
@@ -302,7 +394,9 @@ export function IoTProgramDetail() {
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
         src={program.circuitDiagram}
-        alt={`Circuit diagram for Experiment ${program.experimentNo}`}
+        alt={`Motor circuit diagram for Experiment ${program.experimentNo}`}
+        src2={program.circuitDiagram2}
+        alt2={program.circuitDiagram2 ? `Bulb circuit diagram for Experiment ${program.experimentNo}` : undefined}
       />
     </div>
   );

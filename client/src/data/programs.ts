@@ -560,6 +560,7 @@ export interface IoTProgram {
   aim: string;
   components: IoTComponent[];
   circuitDiagram: string;
+  circuitDiagram2?: string;
   setup: string;
   code?: string;
   result: string;
@@ -655,6 +656,7 @@ void loop() {
       { name: 'Relay SPDT', quantity: '1' },
       { name: '9V Battery', quantity: '1' },],
     circuitDiagram: '/images/iot/circuit-02.png',
+    circuitDiagram2: '/images/iot/circuit-07.png',
     setup: `a) Connect the circuit as per circuit.
 b) Make sure VCC and Ground pins connected properly to avoid any damage to Arduino board.
 c) Open Arduino IDE then go to tools and select appropriate Arduino board.
@@ -687,14 +689,66 @@ delay(1000); // Wait for 1000 millisecond(s)
       { name: 'Resistance (800 S2)', quantity: '2' },
       { name: 'Ultrasonic Distance Sensor (4-pin)', quantity: '1' },
       { name: 'Piezo', quantity: '1' },],
-    circuitDiagram: '/images/iot/circuit-03.png',
+      circuitDiagram: '/images/iot/circuit-03.png',
+      code: `int distance = 0;
+
+long readUltrasonicDistance(int triggerPin, int echoPin)
+{
+  pinMode(triggerPin, OUTPUT);
+
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  
+
+  pinMode(echoPin, INPUT);
+
+  return pulseIn(echoPin, HIGH);
+}
+
+void setup()
+{
+  Serial.begin(9600);
+
+  pinMode(9, OUTPUT);   // Red LED
+  pinMode(10, OUTPUT);   // Green LED
+  pinMode(8, OUTPUT);   // Piezo buzzer
+}
+
+void loop()
+{
+  distance = 0.01723 * readUltrasonicDistance(6, 5);
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Intrusion detection
+  if (distance > 0 && distance <= 8)
+  {
+    digitalWrite(9, HIGH);  // Red LED ON
+    digitalWrite(10, LOW);   // Green LED OFF
+    tone(8, 1000);          // Alarm ON
+  }
+  else
+  {
+    digitalWrite(9, LOW);   // Red LED OFF
+    digitalWrite(10, HIGH);  // Green LED ON
+    noTone(8);              // Alarm OFF
+  }
+
+  delay(100);
+}`,
+    
     setup: `a) Connect the circuit as per circuit.
 b) Make sure VCC and Ground pins connected properly to avoid any damage to Arduino board.
 c) Open Arduino IDE then goto tools and select appropriate Arduino board.
 d) Select tool then select the port select the com port to which board is connected.
 e) Type sketch (Program) and upload to board.`,
     
-    codeImage: '/images/iot/block-code-03.png',
     result: 'Successfully demonstrated deploy an intrusion detection system using Ultrasonic and sound sensors.',
   },
   {
