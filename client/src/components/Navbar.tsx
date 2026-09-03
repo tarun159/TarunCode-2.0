@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, User, Code, Wifi, LayoutDashboard, Cpu, Sun, Moon, Shield } from 'lucide-react';
+import { Menu, X, LogOut, User, Code, Wifi, LayoutDashboard, Cpu, Sun, Moon, Shield, NotepadText } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from './Button';
@@ -22,6 +22,7 @@ export function Navbar() {
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/pc-lab', label: 'PC Lab', icon: Cpu },
     { path: '/iot-lab', label: 'IoT Lab', icon: Wifi },
+    { path: '/pc-notes', label: 'PC Notes', icon: NotepadText },
     ...(isAdmin ? [{ path: '/admin/user-activity', label: 'Admin', icon: Shield }] : []),
   ];
 

@@ -7,6 +7,8 @@ import { ProgramList } from '@/components/ProgramList';
 import { ProgramDetail } from '@/components/ProgramDetail';
 import { IoTProgramList, IoTProgramDetail } from '@/components/iot';
 import { BasicProgramsCollection } from '@/components/BasicProgramsCollection';
+import { NotesModuleList, NotesModuleDetail } from '@/components/notes';
+import { pcNotesModules, pcNotesSection } from '@/data/pcNotes';
 import { Landing } from '@/pages/Landing';
 import { About } from '@/pages/About';
 import { PrivacyPolicy } from '@/pages/PrivacyPolicy';
@@ -91,6 +93,14 @@ function App() {
           <Route
             path="/iot-lab"
             element={<IoTProgramList programs={iotPrograms} isLoading={false} error={null} />}
+          />
+          <Route
+            path="/pc-notes"
+            element={<NotesModuleList config={pcNotesSection} modules={pcNotesModules} />}
+          />
+          <Route
+            path="/pc-notes/:moduleId"
+            element={<NotesModuleDetail config={pcNotesSection} modules={pcNotesModules} />}
           />
           <Route path="/program/iot/:number" element={<IoTProgramDetail />} />
           <Route path="/program/:lab/:number" element={<ProgramDetail />} />

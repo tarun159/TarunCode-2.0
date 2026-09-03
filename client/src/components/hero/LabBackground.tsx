@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import '@/styles/hero.css';
 
-export type Lab = 'pc' | 'iot' | null;
+export type Lab = 'pc' | 'iot' | 'pc-notes' | null;
 
 /**
  * "Holographic Energy Field" — the Dashboard's living 3D background.
@@ -68,10 +68,16 @@ export function LabBackground({ activeLab = null }: { activeLab?: Lab }) {
     });
   };
 
-  const leanClass = activeLab === 'pc' ? 'lean-pc' : activeLab === 'iot' ? 'lean-iot' : '';
-  const stateClass = activeLab === 'pc' ? 'state-pc' : activeLab === 'iot' ? 'state-iot' : '';
+  const leanClass =
+    activeLab === 'pc' ? 'lean-pc' :
+    activeLab === 'iot' ? 'lean-iot' :
+    activeLab === 'pc-notes' ? 'lean-pc' : '';
+  const stateClass =
+    activeLab === 'pc' ? 'state-pc' :
+    activeLab === 'iot' ? 'state-iot' :
+    activeLab === 'pc-notes' ? 'state-pc-notes' : '';
   const pcActive = activeLab === 'pc';
-  const iotActive = activeLab === 'iot';
+  const iotActive = activeLab === 'iot' || activeLab === 'pc-notes';
 
   // Concentric rings: size, depth (--z), and parallax factor (--pf).
   // Colour is driven by the shared palette variables (amber default →

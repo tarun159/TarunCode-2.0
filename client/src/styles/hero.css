@@ -62,6 +62,15 @@
   --lab-scale: 1.25;
   --lab-fx: 84%;         /* focal starts on the IoT / right side */
 }
+.lab-bg.state-pc-notes {
+  --c1: 16, 185, 129;    /* emerald   */
+  --c2: 5, 150, 105;     /* green     */
+  --c3: 4, 120, 87;      /* deep green*/
+  --c-glow: 16, 185, 129;
+  --lab-op: 0.82;
+  --lab-scale: 1.25;
+  --lab-fx: 84%;         /* focal starts on the IoT / right side */
+}
 
 /* ---------- CENTRAL HOLOGRAPHIC ENERGY FIELD ---------- */
 .lab-field {

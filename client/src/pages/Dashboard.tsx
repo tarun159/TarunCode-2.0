@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Cpu, Wifi, ArrowRight } from 'lucide-react';
+import { Cpu, Wifi, NotepadText, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { LabBackground, type Lab } from '@/components/hero/LabBackground';
 
@@ -26,6 +26,14 @@ export function Dashboard() {
       accent: 'from-accent-500 to-accent-700',
       key: 'iot' as const,
     },
+    {
+      to: '/pc-notes',
+      title: 'PC Notes',
+      description: 'Module-wise study notes with questions, answers, and diagrams for quick revision.',
+      icon: NotepadText,
+      accent: 'from-emerald-500 to-teal-700',
+      key: 'pc-notes' as const,
+    },
   ];
 
   return (
@@ -38,7 +46,7 @@ export function Dashboard() {
           Welcome{user ? `, ${user.username}` : ''}
         </h1>
         <p className="text-surface-400 dark:text-surface-400 light:text-slate-500 mb-10">Choose a lab to browse programs.</p>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {labs.map((lab, i) => {
             const Icon = lab.icon;
             return (

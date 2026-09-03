@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare-notes": "python3 scripts/prepare-notes.py"
   },
   "dependencies": {
     "clsx": "^2.1.0",
