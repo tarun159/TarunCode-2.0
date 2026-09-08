@@ -383,7 +383,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     if (rank == 0) {
         number = 50;
-        printf("Process %d broadcasting number %d to all other processes.\n", rank, number);
+        printf("Process %d broadcasting number %d to all other processes.\\n", rank, number);
     }
     MPI_Bcast(&number, 1, MPI_INT, 0, MPI_COMM_WORLD);
     printf("Process %d received number %d\\n", rank, number);
@@ -397,7 +397,7 @@ int main(int argc, char *argv[]) {
       'Compile: mpicc prg7.c -o prg7',
       'Run: mpirun -np 4 ./prg7',
     ],
-    output: 'Factorial: 120\nPrime check\nSwapped values',
+    output: 'Process 0 broadcasting number 50 to all other processes.\nProcess 0 received number 50\nProcess 1 received number 50\nProcess 3 received number 50\nProcess 2 received number 50',
   },
   {
     lab: 'pc',
@@ -422,7 +422,7 @@ int main(int argc, char *argv[]) {
     recv_data = recv_data + rank;
     MPI_Gather(&recv_data, 1, MPI_INT, gathered_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
     if (rank == 0) {
-        printf("Gathered data in root process:\n");
+        printf("Gathered data in root process:\\n");
         for (int i = 0; i < size; i++) {
             printf("gathered_data[%d] = %d\\n", i, gathered_data[i]);
         }
@@ -434,10 +434,10 @@ int main(int argc, char *argv[]) {
     commands: [
      
       'Create: gedit prg8.c',
-      'Compile: gcc prg8.c -o prg8',
-      'Run: ./prg8',
+      'Compile: mpicc prg8.c -o prg8',
+      'Run: mpirun -np 4 ./prg8',
     ],
-    output: 'Address and value via pointer',
+    output: 'Gathered data in root process:\ngathered_data[0] = 0\ngathered_data[1] = 11\ngathered_data[2] = 22\gathered_data[3] = 33',
   },
   {
     lab: 'pc',
