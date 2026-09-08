@@ -370,25 +370,69 @@ int main(int argc, char *argv[]) {
   {
     lab: 'pc',
     number: 7,
-    title: 'Functions - Modular Programming',
-    description: 'Create reusable code with functions, parameters, and return values.',
+    title: 'MPI Broadcast Operation ',
+    description: 'Write a MPI Program to demonstration of Broadcast operation.',
     language: 'c',
-    code: ``,
-    commands: [
+    code: `#include <mpi.h>
+#include <stdio.h>
+int main(int argc, char *argv[]) {
+    int rank, size;
+    int number;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (rank == 0) {
+        number = 50;
+        printf("Process %d broadcasting number %d to all other processes.\n", rank, number);
+    }
+    MPI_Bcast(&number, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    printf("Process %d received number %d\\n", rank, number);
+    MPI_Finalize();
+    return 0;
+}
+`,
+    commands:
+      [
       'Create: gedit prg7.c',
-      'Compile: gcc prg7.c -o prg7',
-      'Run: ./prg7',
+      'Compile: mpicc prg7.c -o prg7',
+      'Run: mpirun -np 4 ./prg7',
     ],
     output: 'Factorial: 120\nPrime check\nSwapped values',
   },
   {
     lab: 'pc',
     number: 8,
-    title: 'Pointers Basics',
-    description: 'Understand memory addresses, pointer declaration, and dereferencing.',
+    title: 'MPI Data Distribution',
+    description: 'Write a MPI Program demonstration of MPI_Scatter and MPI_Gather.',
     language: 'c',
-    code: ``,
+    code: `#include <mpi.h>
+#include <stdio.h>
+int main(int argc, char *argv[]) {
+    int rank, size;
+    int send_data[100], recv_data, gathered_data[100];
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (rank == 0) {
+        for (int i = 0; i < size; i++) {
+            send_data[i] = i * 10;
+        }
+    }
+    MPI_Scatter(send_data, 1, MPI_INT, &recv_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    recv_data = recv_data + rank;
+    MPI_Gather(&recv_data, 1, MPI_INT, gathered_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("Gathered data in root process:\n");
+        for (int i = 0; i < size; i++) {
+            printf("gathered_data[%d] = %d\\n", i, gathered_data[i]);
+        }
+    }
+    MPI_Finalize();
+    return 0;
+}
+`,
     commands: [
+     
       'Create: gedit prg8.c',
       'Compile: gcc prg8.c -o prg8',
       'Run: ./prg8',
