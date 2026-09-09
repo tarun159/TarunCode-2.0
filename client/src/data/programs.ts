@@ -803,7 +803,20 @@ e) Type sketch (Program) and upload to board.`,
     components: [],
     circuitDiagram: '/images/iot/circuit-04.png',
     setup: '',
-    code: '',
+    code: `void setup()
+{
+ pinMode(11, OUTPUT);
+ pinMode(9, OUTPUT);
+}
+void loop()
+{
+ digitalWrite(11, HIGH);
+ digitalWrite(9, LOW);
+ delay(1000); // Wait for 1000 millisecond(s)
+ digitalWrite(9, HIGH);
+ digitalWrite(11, LOW);
+ delay(1000); // Wait for 1000 millisecond(s)
+}`,
     result: '',
   },
   {
@@ -814,7 +827,24 @@ e) Type sketch (Program) and upload to board.`,
     components: [],
     circuitDiagram: '/images/iot/circuit-05.png',
     setup: '',
-    code: '',
+    code: `int sensorPin = A0; 
+int sensorValue = 0;
+int led = 9;
+void setup() {
+ pinMode(led, OUTPUT);
+ Serial.begin(9600);
+} 
+void loop(){
+ sensorValue = analogRead(sensorPin);
+ Serial.println(sensorValue); 
+ if(sensorValue < 100){
+ Serial.println("LED light on");
+ digitalWrite(led,HIGH);
+ delay(1000);
+ }
+ digitalWrite(led,LOW);
+ delay(sensorValue);
+}`,
     result: '',
   },
   {
