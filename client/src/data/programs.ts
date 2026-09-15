@@ -478,8 +478,7 @@ int main(int argc, char *argv[]) {
 }
 `,
     commands: [
-      'Crea
-      te: gedit prg9.c',
+      'Create: gedit prg9.c',
       'Compile: mpicc prg9.c -o prg9',
       'Run: mpirun -np 4 ./prg9',
     ],
