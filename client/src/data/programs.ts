@@ -443,7 +443,7 @@ int main(int argc, char *argv[]) {
     lab: 'pc',
     number: 9,
     title: 'MPI Reduce and Allreduce',
-    description: 'Manipulate character arrays and use standard string library functions.',
+    description: 'Write a MPI Program to demonstration of MPI_Reduce and MPI_Allreduce (MPI_MAX, MPI_MIN, MPI_SUM, MPI_PROD).',
     language: 'c',
     code: `#include <mpi.h>
 #include <stdio.h>
