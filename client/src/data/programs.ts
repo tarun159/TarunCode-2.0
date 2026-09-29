@@ -885,20 +885,74 @@ void loop(){
     aim: 'Develop a program to classify dry and wet waste with the Moisture sensor (DHT22).',
     components: [],
     circuitDiagram: '/images/iot/circuit-06.png',
-    setup: '',
-    code: '',
-    result: '',
+    setup: `a) Connect the circuit as per circuit.
+b) Make sure VCC and Ground pins connected properly to avoid any damage to Arduino board.
+c) Open Arduino IDE then go to tools and select appropriate Arduino board.
+d) Select tool then select the port select the com port to which board is connected.
+e) Type sketch (Program) and upload to board.`,
+    code: `int moistureValue;
+float moisture_percentage;
+void setup() {
+pinMode (7, OUTPUT);
+pinMode (6, OUTPUT);
+pinMode (5, OUTPUT);
+Serial.begin(9600);
+}
+void loop(){
+moistureValue = analogRead(A0);
+moisture_percentage = (moistureValue * 100.0)/539.0;
+if (moisture_percentage >=0 && moisture_percentage<25){
+digitalWrite(7, HIGH);
+digitalWrite(6, LOW);
+digitalWrite(5, LOW);
+}
+else if(moisture_percentage >= 25 && moisture_percentage <80){
+digitalWrite(7, LOW);
+digitalWrite(6, HIGH);
+digitalWrite(5, LOW);
+}
+else if(moisture_percentage >= 80 && moisture_percentage <= 100){
+digitalWrite(7, LOW);
+digitalWrite(6, LOW);
+digitalWrite(5, LOW);
+}
+Serial.print("Moisture Value:");
+Serial.print(moisture_percentage);
+Serial.println("%");
+delay(1000);
+}`,
+    result: 'Successfully demonstrated dry and wet waste with the Moisture sensor (DHR22).',
   },
   {
     id: 'iot-07',
     experimentNo: 7,
     title: 'Develop a program to read the pH value of a various substances like milk, lime and water.',
-    aim: '',
+    aim: 'Develop a program to read the pH value of a various substances like milk, lime and water.',
     components: [],
     circuitDiagram: '/images/iot/circuit-07.png',
     setup: '',
-    code: '',
-    result: '',
+    code: `#include<LiquidCrystal.h>
+const int rs =13,en = 12,d4 =11,d5 =10,d6 =9,d7 =8;
+LiquidCrystal lcd(rs,en, d4,d5,d6,d7);
+int Contrast = 0;
+void setup()
+{
+Serial.begin(9600);
+analogWrite (6,Contrast);
+lcd.begin(16,2);
+lcd.setCursor(4,0);
+lcd.print("pH Value:");
+}
+void loop()
+{
+}
+int sensorValue = analogRead(A0);
+float ph = sensorValue * (14.0/1023.0);
+Serial.println(ph);
+lcd.setCursor(6,1);
+lcd.print (ph);
+}`,
+    result: 'Successfully demonstrated read the pH value of a various substances like milk, lime and water.',
   },
   {
     id: 'iot-08',
